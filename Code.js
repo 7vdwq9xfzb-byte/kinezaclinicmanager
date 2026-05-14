@@ -1879,3 +1879,11 @@ function getCashPaymentsForDate(startDate, endDate, branch) {
 
   return totalCashAmount + totalCashTip;
 }
+function keepWarm() {
+  try {
+    getPatients(); // touches cache and wakes the script
+    console.log('Keep warm OK');
+  } catch (e) {
+    console.error('Keep warm failed:', e);
+  }
+}

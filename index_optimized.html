@@ -24,7 +24,3288 @@
   <button type="button" class="nav-item" data-section="visits"><i class="fa-solid fa-calendar-check"></i> Visits</button>
   <button type="button" class="nav-item" data-section="procedures"><i class="fa-solid fa-scissors"></i> Procedures</button>
   <button type="button" class="nav-item" data-section="visitProcedures"><i class="fa-solid fa-list-check"></i> Visit Procedures</button>
-  <button type="button" class="nav-item" data-section="commissions"><i class="fa-solid fa-file-invoice-dollar"></i> Staff Commissions</button>
+.withSuccessHandler(function(data) {
+  console.timeEnd('getPatients');
+  showPatients(data);
+})!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kineza Clinic Manager</title>
+  <style>
+    :root {
+      --bg-light: #f8f9fa;
+      --sidebar-bg: #fff;
+      --primary-blue: #0f172a;
+      --accent-pink: #f88bc3;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --success-green: #16a34a;
+      --warning-amber: #f59e0b;
+      --input-height: 46px;
+      --spacing-xs: 6px;
+      --spacing-sm: 12px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-main);
+      margin: 0;
+      display: flex
+    }
+
+    .sidebar {
+      width: 220px;
+      background: var(--sidebar-bg);
+      height: 100vh;
+      position: fixed;
+      border-right: 1px solid var(--border-color);
+      padding: 60px 16px 24px
+    }
+
+    .sidebar-logo {
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 60px;
+      padding-left: 12px;
+      text-align: center
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 4px;
+      transition: .2s;
+      background: 0;
+      border: 0;
+      width: 100%;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    .nav-item i {
+      width: 20px;
+      font-size: 18px
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background: #f1f5f9;
+      color: var(--primary-blue)
+    }
+
+    .nav-item.active {
+      font-weight: 600
+    }
+
+    .main-content {
+      margin-left: 260px;
+      padding: 30px 40px 40px;
+      width: 100%
+    }
+
+    .search-container {
+      position: relative;
+      margin-bottom: 20px;
+      margin-top: 5px;
+      width: 100%;
+      display: flex;
+      align-items: center
+    }
+
+    .search-container i {
+      position: absolute;
+      left: 16px;
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none
+    }
+
+    .main-search {
+      width: 100%;
+      padding: 14px 14px 14px 48px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 14px;
+      outline: 0;
+      transition: border-color .2s;
+      font-family: inherit
+    }
+
+    .main-search:focus {
+      border-color: var(--accent-pink)
+    }
+
+    .table-card {
+      width: 100%;
+      border-radius: 12px;
+      overflow-x: auto;
+      background: #fff
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 4px
+    }
+
+    .header-row h1 {
+      margin: 0;
+      font-size: 28px
+    }
+
+    .top-buttons {
+      display: flex;
+      gap: 15px
+    }
+
+    .top-buttons button {
+      background: #0f4d2f;
+      color: #fff;
+      border: 0;
+      padding: 10px 25px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .2s;
+      font-family: inherit
+    }
+
+    .top-buttons button:hover {
+      opacity: .9
+    }
+
+    .scroll-table {
+      max-height: 550px;
+      overflow-y: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      background: #fff
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 50
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      background: #f1f5f9;
+      padding: 16px;
+      text-align: left;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 2px solid var(--border-color)
+    }
+
+    tbody td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 14px
+    }
+
+    tbody tr:hover {
+      background-color: #f9f9f9 !important
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafa
+    }
+
+    .id-pill {
+      background: #f1f5f9;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-weight: 600
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, .6);
+      backdrop-filter: blur(4px)
+    }
+
+    #attendanceStaffList table th,
+    #attendanceStaffList table td,
+    #attendanceTableBody td {
+      padding: 8px 10px;
+      font-size: 13px
+    }
+
+    #attendanceStaffList table {
+      font-size: 13px
+    }
+
+    #attendanceStaffList .form-button {
+      padding: 6px 10px;
+      height: 32px;
+      font-size: 13px;
+      border-radius: 10px
+    }
+
+    #attendanceStaffList tbody tr,
+    #attendanceTableBody tr {
+      line-height: 1.25
+    }
+
+    #attendanceStaffList .text-readonly {
+      padding: 10px
+    }
+
+    #attendanceStaffList .form-select {
+      height: 36px
+    }
+
+    #attendanceStaffList .form-input {
+      height: 36px
+    }
+
+    #attendanceStaffList .form-row {
+      gap: 12px
+    }
+
+    #attendanceStaffList .table-card {
+      border-radius: 10px
+    }
+
+    #attendanceStaffList .scroll-table {
+      max-height: 380px
+    }
+
+    #attendanceStaffList thead th {
+      padding: 10px 10px
+    }
+
+    #attendanceStaffList tbody td {
+      padding: 10px 10px
+    }
+
+    #procedureModal {
+      z-index: 1100
+    }
+
+    #paymentModal {
+      z-index: 1200
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 90%;
+      max-width: 500px;
+      margin: 60px auto;
+      padding: 32px;
+      border-radius: 16px;
+      position: relative;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, .1), 0 10px 10px -5px rgba(0, 0, 0, .04)
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 24px
+    }
+
+    .close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .close:hover {
+      color: var(--primary-blue)
+    }
+
+    .commission-table-wrapper {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ddd
+    }
+
+    #commissionTotalRow {
+      position: sticky;
+      bottom: 0;
+      background: #f3f4f6;
+      font-weight: 700;
+      border-top: 2px solid #ccc
+    }
+
+    tfoot td {
+      padding: 10px
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      margin-top: 16px
+    }
+
+    .modal-content input,
+    .modal-content select,
+    .modal-content textarea {
+      width: 100%;
+      padding: 12px 16px;
+      margin: 0;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: #f8fafc;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: all .2s
+    }
+
+    input[readonly] {
+      background: #f1f5f9;
+      color: var(--text-main)
+    }
+
+    .modal-content input:focus {
+      outline: 0;
+      border-color: #3498db;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, .1)
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px
+    }
+
+    .save-btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: 0;
+      transition: .2s;
+      flex: 1;
+      font-family: inherit
+    }
+
+    .btn-primary {
+      background: var(--primary-blue);
+      color: #fff
+    }
+
+    .btn-secondary {
+      background: #3498db;
+      color: #fff
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #fff
+    }
+
+    .save-btn:hover {
+      opacity: .9;
+      transform: translateY(-1px)
+    }
+
+    #commissions-view>div:first-child,
+    #visits-view>div:first-child {
+      background: 0 !important
+    }
+
+    #commissions-view label,
+    #visits-view label {
+      background: 0 !important
+    }
+
+    .field-group {
+      flex: 1;
+      min-width: 200px
+    }
+
+    .field-group label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 6px
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      align-items: flex-end
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      height: var(--input-height);
+      padding: 0 var(--spacing-md);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-main);
+      box-sizing: border-box
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: 0;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, .1)
+    }
+
+    .form-input[readonly] {
+      background: #f1f5f9
+    }
+
+    .form-select {
+      padding: 0 var(--spacing-md)
+    }
+
+    .form-button {
+      background: var(--primary-blue);
+      color: #fff;
+      border: 0;
+      padding: var(--spacing-sm) var(--spacing-lg);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      height: var(--input-height);
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .form-button:hover {
+      opacity: .9;
+      transform: translateY(-1px)
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .flex-center {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md)
+    }
+
+    .text-readonly {
+      background: #f1f5f9;
+      padding: var(--spacing-sm);
+      border-radius: 8px
+    }
+
+    .payment-status {
+      font-weight: 700;
+      font-size: 14px;
+      white-space: nowrap
+    }
+  </style>
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  </noscript>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  </noscript>
+</head>
+
+<body>
+  <div class="sidebar">
+    <div style="text-align:center;margin-bottom:10px">
+      <img src="https://i.imgur.com/iOSDFDG.png" alt="Clinic logo" loading="lazy" style="width:200px;height:auto">
+    </div>
+    <div class="sidebar-logo">Clinic Manager</div>
+    <button type="button" class="nav-item active" data-section="patients"><i class="fa-solid fa-users"></i> Patients</button>
+    <button type="button" class="nav-item" data-section="visits"><i class="fa-solid fa-calendar-check"></i> Visits</button>
+    <button type="button" class="nav-item" data-section="procedures"><i class="fa-solid fa-scissors"></i> Procedures</button>
+    <button type="button" class="nav-item" data-section="visitProcedures"><i class="fa-solid fa-list-check"></i> Visit Procedures</button>
+    <button type="button" class="nav-item" data-section="commissions"><i class="fa-solid fa-file-invoice-dollar"></i> Staff Commissions</button>
+    <button type="button" class="nav-item" data-section="payments"><i class="fa-solid fa-money-bill-wave"></i> Payments</button>
+    <button type="button" class="nav-item" data-section="expenses"><i class="fa-solid fa-receipt"></i> Daily Expenses</button>
+    <button type="button" class="nav-item" data-section="inventory"><i class="fa-solid fa-box-archive"></i> Inventory</button>
+    <button type="button" class="nav-item" data-section="attendance"><i class="fa-solid fa-clock"></i> Attendance</button>
+    <button type="button" class="nav-item" data-section="salary"><i class="fa-solid fa-wallet"></i> Salary Rates</button>
+  </div>
+
+  <div class="main-content">
+    <p id="accessModeBanner" class="text-readonly" style="display:none;margin:0 0 12px;font-size:13px"></p>
+    <div class="header-row">
+      <h1 id="section-title">Patients</h1>
+      <div class="top-buttons" id="top-buttons">
+        <button type="button" id="main-action-btn" style="background:var(--primary-blue)"><i class="fa-solid fa-plus"></i> Add Patient</button>
+      </div>
+    </div>
+
+    <div class="search-container" id="patient-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" class="main-search" id="patientSearchInput" placeholder="Search patients...">
+    </div>
+
+    <div class="table-card" style="width:100%">
+      <div id="patients-view" class="view-section">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Patient ID</th>
+              <th>Date Registered</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>DOB</th>
+              <th>Age</th>
+              <th>Gender</th>
+            </tr>
+          </thead>
+          <tbody id="patientTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="visits-view" class="view-section" style="display:none">
+      <div class="form-row">
+        <div class="field-group" style="flex:2">
+          <div class="search-container" style="flex:1;margin:0;min-width:0">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="visitSearch" class="main-search" placeholder="Search visits...">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Visit Date</label>
+          <input type="date" id="visitDateFilter" class="form-input">
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">For speed, only the newest visits load in this
+        table. The full history remains in Google Sheets; you can raise the limit in Apps Script (constant
+        MAX_LIST_VISITS).</p>
+      <div class="table-card scroll-table">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Visit ID</th>
+              <th>Patient Name</th>
+              <th>Visit Date</th>
+              <th>Branch Location</th>
+              <th>Payment</th>
+            </tr>
+          </thead>
+          <tbody id="visitTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="commissions-view" class="view-section" style="display:none">
+      <p id="branchCommissionNote" style="display:none;font-size:13px;color:var(--text-muted);margin:0 0 10px">Your
+        branch is fixed for branch accounts. You can still filter by date range and staff.</p>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Start Date</label>
+          <input type="date" id="commissionStart" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>End Date</label>
+          <input type="date" id="commissionEnd" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>Staff</label>
+          <select id="commissionStaff" class="form-select"><option value="">All Staff</option></select>
+        </div>
+        <div class="field-group">
+          <label>Branch</label>
+          <select id="commissionBranch" class="form-select">
+          <option value="">All Branches</option>
+          <option value="Angeles">Angeles</option>
+          <option value="Olongapo">Olongapo</option>
+          <option value="Quezon City">Quezon City</option>
+        </select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button type="button" onclick="loadStaffCommissions()" class="form-button">Filter</button>
+        </div>
+      </div>
+      <div class="table-card scroll-table">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Staff</th>
+              <th>Date</th>
+              <th>Procedure</th>
+              <th>Commission</th>
+              <th>Tip</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="commissionTable"></tbody>
+          <tfoot>
+            <tr id="commissionTotalRow">
+              <td colspan="3" style="font-weight:700">Totals</td>
+              <td id="commissionTotalAmount">₱0.00</td>
+              <td id="commissionTotalTip">₱0.00</td>
+              <td id="commissionTotalCombined">₱0.00</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div id="payments-view" class="view-section" style="display:none">
+      <div class="form-row">
+        <div class="field-group">
+          <label>Start date</label>
+          <input type="date" id="paymentsStart" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>End date</label>
+          <input type="date" id="paymentsEnd" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>Branch</label>
+          <select id="paymentsBranch" class="form-select">
+          <option value="">All branches</option>
+          <option value="Angeles">Angeles</option>
+          <option value="Olongapo">Olongapo</option>
+          <option value="Quezon City">Quezon City</option>
+        </select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button type="button" class="form-button" onclick="loadPaymentsReport()">Apply filter</button>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">Each row is a payment record. Date and branch
+        come from the linked visit. Leave both dates empty to load all payments (may be slower with very large sheets).
+      </p>
+      <div class="table-card scroll-table">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Visit ID</th>
+              <th>Patient</th>
+              <th>Visit date</th>
+              <th>Branch</th>
+              <th>Amount paid</th>
+              <th>Payment method</th>
+              <th>Tip</th>
+              <th>Tip method</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsTableBody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="font-weight:700;text-align:right" id="paymentsFootSummaryLabel">Totals (0 payments)
+              </td>
+              <td id="paymentsFootAmount" style="font-weight:700">₱0</td>
+              <td></td>
+              <td id="paymentsFootTip" style="font-weight:700">₱0</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td colspan="4" style="font-weight:700;text-align:right">Grand total (payments + tips)</td>
+              <td colspan="4" id="paymentsFootGrand" style="font-weight:700">₱0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div id="paymentsBreakdown" class="text-readonly" style="margin-top:12px"></div>
+    </div>
+
+    <div id="expenses-view" class="view-section" style="display:none">
+      <div class="form-row">
+        <div class="field-group">
+          <label>Start Date</label>
+          <input type="date" id="expensesStart" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>End Date</label>
+          <input type="date" id="expensesEnd" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>Branch</label>
+          <select id="expensesBranch" class="form-select">
+          <option value="">All Branches</option>
+          <option value="Angeles">Angeles</option>
+          <option value="Olongapo">Olongapo</option>
+          <option value="Quezon City">Quezon City</option>
+        </select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button type="button" class="form-button" onclick="loadExpenses()">Apply Filter</button>
+        </div>
+      </div>
+
+      <!-- Cash Flow Summary -->
+      <div class="table-card" style="margin-bottom:20px;padding:20px">
+        <h3 style="margin:0 0 15px 0;color:var(--primary-blue)">Daily Cash Flow Summary</h3>
+        <div class="form-row">
+          <div class="field-group">
+            <label>Select Date for Cash Flow</label>
+            <input type="date" id="cashFlowDate" class="form-input">
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button type="button" class="form-button" onclick="loadCashFlow()">Load Cash Flow</button>
+          </div>
+        </div>
+        <div id="cashFlowSummary"
+          style="margin-top:15px;padding:15px;background:#f8f9fa;border-radius:8px;display:none">
+          <div
+            style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:15px">
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:700;color:#16a34a" id="cashReceived">₱0</div>
+              <div style="font-size:12px;color:var(--text-muted)">Cash Received</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:700;color:#ef4444" id="totalExpenses">₱0</div>
+              <div style="font-size:12px;color:var(--text-muted)">Total Expenses</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:18px;font-weight:700;color:var(--primary-blue)" id="cashOnHand">₱0</div>
+              <div style="font-size:12px;color:var(--text-muted)">Cash on Hand</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted)">
+            <strong>Note:</strong> Cash on hand = Cash received from procedures - Daily expenses. Keep around ₱2,000 for
+            unexpected payments.
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card scroll-table">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Expense ID</th>
+              <th>Date</th>
+              <th>Branch</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="expensesTableBody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="font-weight:700;text-align:right" id="expensesFootSummaryLabel">Total (0 expenses)
+              </td>
+              <td id="expensesFootAmount" style="font-weight:700">₱0</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div id="procedures-view" class="view-section" style="display:none">
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" class="main-search" id="proceduresSearch" placeholder="Search procedures...">
+      </div>
+      <div class="table-card scroll-table">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Procedure Name</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody id="proceduresTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="visitProcedures-view" class="view-section" style="display:none">
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 10px">For speed, only the most recent visit-procedure
+        rows load here (tune MAX_VISIT_PROCEDURES_LIST in Apps Script if needed). Use search to narrow.</p>
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" class="main-search" id="visitProcSearch" placeholder="Search visit procedures...">
+      </div>
+      <div class="table-card scroll-table">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Visit ID</th>
+              <th>Procedure</th>
+              <th>Staff</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody id="visitProceduresTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="inventory-view" class="view-section" style="display:none">
+      <p class="text-readonly" style="margin:0">Inventory is not connected yet. Add a sheet and server functions when
+        you are ready.</p>
+    </div>
+
+    <div id="attendance-view" class="view-section" style="display:none">
+      <div class="form-row">
+        <div class="field-group">
+          <label>Branch</label>
+          <select id="attendanceBranch" class="form-select" onchange="attendanceBranchChanged()">
+          <option value="">Select Branch</option>
+          <option value="Angeles">Angeles</option>
+          <option value="Olongapo">Olongapo</option>
+          <option value="Quezon City">Quezon City</option>
+        </select>
+        </div>
+        <div class="field-group" style="display:flex;align-items:flex-end;min-width:200px">
+          <button type="button" class="form-button" onclick="attendanceBranchChanged()">Load Staff</button>
+        </div>
+      </div>
+
+      <div id="attendanceStaffPlaceholder" class="text-readonly" style="margin-top:20px;display:none">
+        Select a branch to load staff and clock attendance.
+      </div>
+
+      <div id="attendanceStaffList" class="table-card scroll-table" style="margin-top:20px;display:none">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Staff</th>
+              <th>Current Status</th>
+              <th>Last Action</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceStaffTableBody"></tbody>
+        </table>
+      </div>
+
+      <hr style="margin:30px 0;border:none;border-top:1px solid var(--border-color)">
+
+      <h3 style="margin-bottom:15px;color:var(--primary-blue)">Attendance Records</h3>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Start Date</label>
+          <input type="date" id="attendanceStart" class="form-input" onchange="attendanceDateChanged()">
+        </div>
+        <div class="field-group">
+          <label>End Date</label>
+          <input type="date" id="attendanceEnd" class="form-input" onchange="attendanceDateChanged()">
+        </div>
+        <div class="field-group">
+          <label>Staff</label>
+          <select id="attendanceStaffFilter" class="form-select" onchange="attendanceDateChanged()">
+          <option value="">All Staff</option>
+        </select>
+        </div>
+      </div>
+
+      <div class="table-card scroll-table">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Branch</th>
+              <th>Staff</th>
+              <th>Time In</th>
+              <th>Time Out</th>
+              <th>Hours</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="attendanceTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+
+    <div id="salary-view" class="view-section" style="display:none">
+      <div class="form-row">
+        <div class="field-group">
+          <label>Start Date</label>
+          <input type="date" id="salaryStart" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>End Date</label>
+          <input type="date" id="salaryEnd" class="form-input">
+        </div>
+        <div class="field-group">
+          <label>Branch</label>
+          <select id="salaryBranch" class="form-select">
+          <option value="">All Branches</option>
+          <option value="Angeles">Angeles</option>
+          <option value="Olongapo">Olongapo</option>
+          <option value="Quezon City">Quezon City</option>
+        </select>
+        </div>
+        <div class="field-group">
+          <label>Staff</label>
+          <select id="salaryStaffFilter" class="form-select">
+          <option value="">All Staff</option>
+        </select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button type="button" class="form-button" onclick="loadSalaryReport()">Compute Salaries</button>
+          <button type="button" class="form-button" style="margin-left:10px" onclick="exportSalaryReport()">Export to Sheet</button>
+        </div>
+      </div>
+
+      <div class="table-card scroll-table" id="salaryReportTable" style="display:none">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Branch</th>
+              <th>Staff</th>
+              <th>Hours Worked</th>
+              <th>Daily Rate</th>
+              <th>Pay</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="salaryReportBody"></tbody>
+        </table>
+      </div>
+
+      <div class="table-card" id="salarySummaryTable" style="display:none;margin-top:20px">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Staff</th>
+              <th>Branch</th>
+              <th>Daily Rate</th>
+              <th>Total Hours</th>
+              <th>Total Pay</th>
+            </tr>
+          </thead>
+          <tbody id="salarySummaryBody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="font-weight:700;text-align:right">Grand Totals</td>
+              <td id="salaryTotalHours" style="font-weight:700">0</td>
+              <td id="salaryTotalPay" style="font-weight:700">₱0</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <hr style="margin:30px 0;border:none;border-top:1px solid var(--border-color)">
+
+      <h3 style="margin-bottom:15px;color:var(--primary-blue)">Manage Salary Rates</h3>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Branch</label>
+          <select id="salaryRateBranch" class="form-select" onchange="loadSalaryTable()">
+          <option value="">All Branches</option>
+          <option value="Angeles">Angeles</option>
+          <option value="Olongapo">Olongapo</option>
+          <option value="Quezon City">Quezon City</option>
+        </select>
+        </div>
+        <div class="field-group">
+          <label>Staff</label>
+          <select id="salaryStaffFilter2" class="form-select" onchange="loadSalaryTable()">
+          <option value="">All Staff</option>
+        </select>
+        </div>
+        <div class="field-group">
+          <label>Staff Name</label>
+          <input type="text" id="salaryStaffName" class="form-input" placeholder="Staff name">
+        </div>
+        <div class="field-group">
+          <label>Daily Rate</label>
+          <input type="text" id="salaryHourlyRate" class="form-input" placeholder="₱0.00" oninput="formatPrice(this)">
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button type="button" class="form-button" onclick="saveSalaryRate()">Save Rate</button>
+        </div>
+      </div>
+
+      <div class="table-card scroll-table">
+        <table style="width:100%;table-layout:auto">
+          <thead>
+            <tr>
+              <th>Branch</th>
+              <th>Staff</th>
+              <th>Daily Rate</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="salaryTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="patientModal">
+      <div class="modal-content">
+        <span class="close" onclick="closePatientModal()">&times;</span>
+        <h2>New Patient</h2>
+        <div style="margin-bottom:15px">
+          <label style="display:block;margin-bottom:5px;font-weight:500">First Name</label>
+          <input type="text" id="firstName" placeholder="Enter first name" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px">
+        </div>
+        <div style="margin-bottom:15px">
+          <label style="display:block;margin-bottom:5px;font-weight:500">Last Name</label>
+          <input type="text" id="lastName" placeholder="Enter last name" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px">
+        </div>
+        <div style="margin-bottom:15px">
+          <label style="display:block;margin-bottom:5px;font-weight:500">Date of Birth</label>
+          <input type="date" id="dob" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px">
+        </div>
+        <div style="margin-bottom:20px">
+          <label style="display:block;margin-bottom:5px;font-weight:500">Gender</label>
+          <select id="gender" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        </div>
+        <button type="button" class="save-btn" onclick="savePatient()">Save Patient</button>
+      </div>
+    </div>
+
+    <div class="modal" id="procedureMasterModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeProcedureMasterModal()">&times;</span>
+        <h2>Add Procedure</h2>
+        <input type="hidden" id="editProcedureRow">
+        <label>Type</label>
+        <select id="newProcedureType"><option>Doctor</option><option>Clinic</option><option>Product</option></select>
+        <label>Procedure Name</label>
+        <input type="text" id="newProcedureName">
+        <label>Price</label>
+        <input type="text" id="newProcedurePrice">
+        <div class="modal-footer">
+          <button type="button" class="save-btn btn-primary" onclick="saveNewProcedure()">Save</button></div>
+      </div>
+    </div>
+
+    <div class="modal" id="editModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeEditModal()"><i class="fa-solid fa-xmark"></i></span>
+        <h2>Edit Patient Details</h2>
+        <button type="button" class="save-btn" style="background:#A9BD93;margin-bottom:24px;color:#fff" onclick="shortcutToVisit()"><i class="fa-solid fa-calendar-plus"></i> + Add Visit for this Patient</button>
+        <div style="border-top:1px solid var(--border-color);padding-top:8px">
+          <div style="margin-bottom:15px">
+            <label style="display:block;margin-bottom:5px;font-weight:500">First Name</label>
+            <input type="text" id="editFirstName" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px">
+          </div>
+          <div style="margin-bottom:15px">
+            <label style="display:block;margin-bottom:5px;font-weight:500">Last Name</label>
+            <input type="text" id="editLastName" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px">
+          </div>
+          <div style="margin-bottom:15px">
+            <label style="display:block;margin-bottom:5px;font-weight:500">Date of Birth</label>
+            <input type="date" id="editDob" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px">
+          </div>
+          <div style="margin-bottom:15px">
+            <label style="display:block;margin-bottom:5px;font-weight:500">Gender</label>
+            <select id="editGender" style="width:100%;padding:8px;border:1px solid var(--border-color);border-radius:6px">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="save-btn btn-primary" onclick="savePatientEdits()">Save Changes</button>
+          <button type="button" class="save-btn btn-danger" onclick="removePatient()">Delete Record</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="visitModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeVisitModal()"><i class="fa-solid fa-xmark"></i></span>
+        <h2>Add Visit</h2>
+        <label>Patient Full Name</label>
+        <input type="text" id="searchFullName" list="patientList" placeholder="Search by name..." autocomplete="off">
+        <datalist id="patientList"></datalist>
+        <div style="display:flex;gap:12px;margin-top:16px">
+          <div style="flex:1"><label>DOB</label><input type="text" id="visitDOB" readonly style="background:#f1f5f9">
+          </div>
+          <div style="flex:1"><label>Age</label><input type="text" id="visitAge" readonly style="background:#f1f5f9">
+          </div>
+        </div>
+        <label>Visit Date & Time</label>
+        <input type="text" id="visitDateTime" readonly style="background:#f1f5f9;font-weight:500">
+        <label>Branch Location</label>
+        <select id="branchLocation"><option value="">-- Select Branch --</option><option value="Angeles">Angeles</option><option value="Olongapo">Olongapo</option><option value="Quezon City">Quezon City</option></select>
+        <label>Remarks</label>
+        <textarea id="remarks" rows="3" style="width:100%;border-radius:10px;border:1px solid var(--border-color);padding:12px;font-family:inherit;box-sizing:border-box"></textarea>
+        <div style="margin-top:32px">
+          <button type="button" class="save-btn btn-primary" onclick="saveVisit()">Add Visit to Patient</button></div>
+      </div>
+    </div>
+
+    <div class="modal" id="procedureModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeProcedureModal()">&times;</span>
+        <h2>Add Procedure</h2>
+        <input type="hidden" id="procedureVisitId">
+        <input type="hidden" id="procedureRowIndex">
+        <input type="hidden" id="procedureBundleId">
+        <label>Procedure Type</label>
+        <select id="procedureType" onchange="loadProcedureNames()"><option value="">Select Type</option><option value="Doctor">Doctor</option><option value="Clinic">Clinic</option><option value="Product">Product</option></select>
+        <label>Procedure Name</label>
+        <select id="procedureName"><option value="">Select Procedure</option></select>
+        <label>Procedure Variant</label>
+        <input type="text" id="procedureVariant">
+        <label>Session/s</label>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="number" id="procedureSession" style="width:100px">
+          <span style="font-weight:600;color:var(--text-muted)">of</span>
+          <input type="number" id="procedureTotalSessions" style="width:100px">
+        </div>
+        <label>Assisted By</label>
+        <div id="staffChecklist"
+          style="border:1px solid var(--border-color);border-radius:10px;padding:12px;max-height:150px;overflow-y:auto;background:#f8fafc">
+          Loading staff...</div>
+        <label>Price</label>
+        <input type="text" id="procedurePrice" placeholder="₱0.00" oninput="formatPrice(this)">
+        <div class="modal-footer">
+          <button type="button" id="saveProcedureBtn" class="save-btn btn-primary" onclick="saveProcedure()">Add Procedure</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="editVisitModal">
+      <div class="modal-content" style="max-width:900px;max-height:90vh;overflow-y:auto;padding:22px">
+        <span class="close" onclick="closeEditVisitModal()"><i class="fa-solid fa-xmark"></i></span>
+        <h2>Edit Visit</h2>
+        <input type="hidden" id="editVisitId">
+        <div style="display:flex;gap:12px">
+          <div style="flex:2"><label>Patient</label><input type="text" id="editVisitPatient" readonly></div>
+          <div style="flex:1"><label>Visit Date</label><input type="text" id="editVisitDate"></div>
+          <div style="flex:1">
+            <label>Branch</label><select id="editVisitBranch"><option value="Angeles">Angeles</option><option value="Olongapo">Olongapo</option><option value="Quezon City">Quezon City</option></select>
+          </div>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:10px">
+          <button type="button" class="save-btn" style="background:#A9BD93;color:#fff" onclick="openProcedureModal()"><i class="fa-solid fa-scissors"></i> + Add Procedure</button>
+          <button type="button" class="save-btn" style="background:#0f4d2f;color:#fff" onclick="loadExistingSessions()"><i class="fa-solid fa-rotate-right"></i> Add Existing Session</button>
+        </div>
+        <div style="margin-top:15px"><label>Procedures</label>
+          <div
+            style="max-height:250px;overflow-y:auto;position:relative;border:1px solid var(--border-color);border-radius:10px">
+            <table style="width:100%;margin:0">
+              <thead style="position:sticky;top:0;background:#f1f5f9;z-index:1">
+                <tr>
+                  <th>Procedure</th>
+                  <th>Date</th>
+                  <th>Session</th>
+                  <th>Total</th>
+                  <th>Assisted By</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody id="visitProcedureTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:end;margin-top:12px">
+          <div style="flex:1">
+            <div style="margin-top:12px"><label>Total Price</label>
+              <div style="display:flex;align-items:center;gap:15px">
+                <input type="text" id="visitTotalPrice" readonly style="width:250px;flex:none"><button type="button" id="paymentBtn" class="save-btn" style="width:180px;flex:none;background:#0f4d2f;color:#fff;margin-top:0" onclick="openPaymentModal()">Make Payment</button><span id="paymentStatus" style="font-weight:700;font-size:14px;color:#16a34a;white-space:nowrap"></span>
+              </div>
+            </div>
+            <div
+              style="margin-top:12px;padding:10px;border:1px solid var(--border-color);border-radius:10px;background:#f8fafc">
+              <label style="margin-top:0;margin-bottom:6px;font-size:12px">Payment Details</label>
+              <div style="display:flex;gap:8px">
+                <div style="flex:1"><label style="margin-top:0">Payment/s Made</label><input type="text" id="displayAmountPaid" readonly style="padding:8px 12px">
+                </div>
+                <div style="flex:1"><label style="margin-top:0">Balance</label><input type="text" id="displayBalance" readonly style="padding:8px 12px">
+                </div>
+                <div style="flex:1"><label style="margin-top:0">Payment Method</label><input type="text" id="displayPaymentMethod" readonly style="padding:8px 12px">
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <div style="flex:1"><label style="margin-top:0">Tip</label><input type="text" id="displayTipAmount" readonly style="padding:8px 12px">
+                </div>
+                <div style="flex:1"><label style="margin-top:0">Tip Method</label><input type="text" id="displayTipMethod" readonly style="padding:8px 12px">
+                </div>
+              </div>
+            </div><label>Remarks</label><textarea id="editVisitRemarks" rows="1"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer" style="margin-top:18px">
+          <button type="button" class="save-btn btn-primary" onclick="updateVisitRecord()">Save Changes</button><button type="button" class="save-btn btn-danger" onclick="removeVisit()">Delete Visit</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="paymentModal">
+      <div class="modal-content" style="max-width:650px;padding:28px">
+        <span class="close" onclick="closePaymentModal()">&times;</span>
+        <h2>Payment Details</h2>
+        <label>Total Price</label>
+        <input type="text" id="paymentTotal" readonly style="max-width:250px">
+        <div style="display:flex;gap:12px;margin-top:15px">
+          <div style="flex:1"><label>Amount Paid</label><input type="text" id="amountPaid" oninput="formatPrice(this)">
+          </div>
+          <div style="flex:1">
+            <label>Mode of Payment</label><select id="paymentMethod"><option value="" selected disabled>Please select</option><option value="Cash">Cash</option><option value="GCash">GCash</option><option value="Credit/Debit Card">Credit/Debit Card</option><option value="Maya">Maya</option><option value="Bank Transfer (BPI)">Bank Transfer (BPI)</option><option value="Bank Transfer (PS Bank)">Bank Transfer (PS Bank)</option><option value="Bank Transfer (Security Bank)">Bank Transfer (Security Bank)</option></select>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:15px">
+          <div style="flex:1"><label>Tip Amount</label><input type="text" id="tipAmount" oninput="formatPrice(this)">
+          </div>
+          <div style="flex:1">
+            <label>Tip Payment Method</label><select id="tipMethod"><option value="" selected disabled>Please select</option><option value="GCash">GCash</option><option value="Credit/Debit Card">Credit/Debit Card</option><option value="Maya">Maya</option><option value="Bank Transfer (BPI)">Bank Transfer (BPI)</option><option value="Bank Transfer (PS Bank)">Bank Transfer (PS Bank)</option><option value="Bank Transfer (Security Bank)">Bank Transfer (Security Bank)</option></select>
+          </div>
+        </div>
+        <div class="modal-footer" style="margin-top:25px">
+          <button type="button" class="save-btn btn-primary" onclick="savePayment()">Save Payment</button></div>
+      </div>
+    </div>
+
+    <div class="modal" id="expenseModal">
+      <div class="modal-content">
+        <span class="close" onclick="closeExpenseModal()">&times;</span>
+        <h2 id="expenseModalTitle">Add Daily Expense</h2>
+        <input type="hidden" id="expenseRowIndex">
+        <label>Date</label>
+        <input type="date" id="expenseDate" required>
+        <label>Branch</label>
+        <select id="expenseBranch" required>
+        <option value="">Select Branch</option>
+        <option value="Angeles">Angeles</option>
+        <option value="Olongapo">Olongapo</option>
+        <option value="Quezon City">Quezon City</option>
+      </select>
+        <label>Description</label>
+        <input type="text" id="expenseDescription" placeholder="e.g., Mineral Water, COD delivery, etc." required>
+        <label>Amount</label>
+        <input type="text" id="expenseAmount" placeholder="₱0.00" oninput="formatPrice(this)" required>
+        <div class="modal-footer">
+          <button type="button" class="save-btn btn-secondary" onclick="closeExpenseModal()">Cancel</button>
+          <button type="button" id="saveExpenseBtn" class="save-btn btn-primary" onclick="saveExpense()">Save Expense</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let allVisits = [], allPatientsData = [], lastPatientMatches = [], selectedPatientId = null, currentLoadingVisitId = null;
+let appAccess = { mode: 'full', lockBranch: '', canViewPaymentsReport: true, email: '' };
+const domCache = {};
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function cacheDOM(id) {
+  return domCache[id] = domCache[id] || document.getElementById(id);
+}
+
+function applyWebAppAccess(access) {
+  appAccess = access || appAccess;
+  const banner = cacheDOM('accessModeBanner');
+  const branchNote = cacheDOM('branchCommissionNote');
+  const payNav = document.querySelector('.nav-item[data-section="payments"]');
+  const salaryNav = document.querySelector('.nav-item[data-section="salary"]');
+  const cb = cacheDOM('commissionBranch');
+  const expensesBranch = cacheDOM('expensesBranch');
+  const expenseBranchSelect = cacheDOM('expenseBranch');
+
+  if (appAccess.canViewPaymentsReport === false) {
+    if (payNav) payNav.style.display = 'none';
+    if (salaryNav) salaryNav.style.display = 'none';
+    if (banner) {
+      banner.style.display = 'block';
+      banner.textContent = 'Branch account: the Payments report is hidden. Staff commissions and expenses below are limited to ' + (appAccess.lockBranch || 'your branch') + '.';
+    }
+    if (branchNote) branchNote.style.display = 'block';
+    if (cb) {
+      cb.value = appAccess.lockBranch || '';
+      cb.disabled = true;
+    }
+    if (expensesBranch) {
+      expensesBranch.value = appAccess.lockBranch || '';
+      expensesBranch.disabled = true;
+    }
+    if (expenseBranchSelect) {
+      expenseBranchSelect.value = appAccess.lockBranch || '';
+      expenseBranchSelect.disabled = true;
+    }
+    const attendanceBranch = cacheDOM('attendanceBranch');
+    if (attendanceBranch) {
+      attendanceBranch.value = appAccess.lockBranch || '';
+      attendanceBranch.disabled = true;
+    }
+  } else {
+    if (payNav) payNav.style.display = '';
+    if (salaryNav) salaryNav.style.display = '';
+    if (banner) banner.style.display = 'none';
+    if (branchNote) branchNote.style.display = 'none';
+    if (cb) cb.disabled = false;
+    const attendanceBranch = cacheDOM('attendanceBranch');
+    if (attendanceBranch) {
+      attendanceBranch.disabled = false;
+    }
+  }
+}
+
+function debounce(fn, ms) {
+  let t;
+  return function (...args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), ms);
+  };
+}
+
+function showToast(message, type = 'info') {
+  // Remove existing toast
+  const existingToast = document.querySelector('.toast-notification');
+  if (existingToast) existingToast.remove();
+
+  // Create new toast
+  const toast = document.createElement('div');
+  toast.className = 'toast-notification';
+  toast.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#16a34a' : type === 'error' ? '#ef4444' : '#3b82f6'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10000;
+    font-weight: 500;
+    max-width: 300px;
+    word-wrap: break-word;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+  `;
+
+  const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+  toast.innerHTML = `<i class="fa-solid ${icon}"></i> ${message}`;
+
+  document.body.appendChild(toast);
+
+  // Animate in
+  setTimeout(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+  }, 10);
+
+  // Auto remove after 3 seconds
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-10px)';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+console.time('getPatients');
+function loadPatients() {
+  const table = cacheDOM('patientTable');
+  if (table) table.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px"><i class="fa-solid fa-spinner fa-spin"></i> Loading patients...</td></tr>';
+  google.script.run
+    .withSuccessHandler(function(data) {
+  console.timeEnd('getPatients');
+  showPatients(data);
+})
+
+    .withFailureHandler(err => {
+      console.error(err);
+      if (table) table.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:20px"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load patients: ' + err.message + '</td></tr>';
+      alert('Could not load patients: ' + err.message);
+    })
+    .getPatients();
+}
+
+function filterTable(query) {
+  const filter = query.toLowerCase().trim();
+  const rows = document.querySelectorAll('#patientTable tr');
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    if (!row.cells || row.cells.length < 7) return;
+
+    const id = row.cells[0].innerText.toLowerCase();
+    const firstName = row.cells[2].innerText.toLowerCase();
+    const lastName = row.cells[3].innerText.toLowerCase();
+    const fullName = firstName + ' ' + lastName;
+    const dob = row.cells[4].innerText.toLowerCase();
+    const age = row.cells[5].innerText.toLowerCase();
+    const gender = row.cells[6].innerText.toLowerCase();
+
+    // Check if query matches any field or combination
+    const matches = !filter ||
+      id.includes(filter) ||
+      firstName.includes(filter) ||
+      lastName.includes(filter) ||
+      fullName.includes(filter) ||
+      dob.includes(filter) ||
+      age.includes(filter) ||
+      gender.includes(filter);
+
+    row.style.display = matches ? '' : 'none';
+    if (matches) visibleCount++;
+  });
+
+  // Update search result count if we have a search container
+  const searchContainer = document.querySelector('.search-container');
+  if (searchContainer && filter) {
+    let countEl = searchContainer.querySelector('.search-count');
+    if (!countEl) {
+      countEl = document.createElement('span');
+      countEl.className = 'search-count';
+      countEl.style.cssText = 'font-size:12px;color:var(--text-muted);margin-left:10px;';
+      searchContainer.appendChild(countEl);
+    }
+    countEl.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
+  } else if (searchContainer) {
+    const countEl = searchContainer.querySelector('.search-count');
+    if (countEl) countEl.remove();
+  }
+}
+
+function showPatients(data) {
+  allPatientsData = data || [];
+  const table = cacheDOM('patientTable');
+  if (!table) return;
+  table.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  allPatientsData.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => openEditModal(p);
+    tr.innerHTML = '<td><span class="id-pill">' + escapeHtml(p.id) + '</span></td><td style="color:var(--text-muted)">' + escapeHtml(p.dateRegistered) + '</td><td style="font-weight:500">' + escapeHtml(p.firstName) + '</td><td style="font-weight:500">' + escapeHtml(p.lastName) + '</td><td>' + escapeHtml(p.dob) + '</td><td>' + escapeHtml(p.age) + '</td><td>' + escapeHtml(p.gender || '') + '</td>';
+    frag.appendChild(tr);
+  });
+  table.appendChild(frag);
+}
+
+function showSection(sectionName, navEl) {
+  if (appAccess && appAccess.canViewPaymentsReport === false && sectionName === 'payments') {
+    return;
+  }
+  document.querySelectorAll('.view-section').forEach(s => { s.style.display = 'none'; });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  const title = cacheDOM('section-title');
+  const topButtons = cacheDOM('top-buttons');
+  const patientSearch = cacheDOM('patient-search');
+  topButtons.style.display = 'none';
+  patientSearch.style.display = 'none';
+  if (sectionName === 'patients') {
+    cacheDOM('patients-view').style.display = 'block';
+    title.innerText = 'Patients';
+    topButtons.style.display = 'flex';
+    patientSearch.style.display = 'flex';
+    cacheDOM('main-action-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Add Patient';
+    cacheDOM('main-action-btn').onclick = openPatientModal;
+    loadPatients();
+  } else if (sectionName === 'visits') {
+    cacheDOM('visits-view').style.display = 'block';
+    title.innerText = 'Visits';
+    loadVisits();
+  } else if (sectionName === 'commissions') {
+    cacheDOM('commissions-view').style.display = 'block';
+    title.innerText = 'Staff Commissions';
+    loadStaffCommissions();
+  } else if (sectionName === 'payments') {
+    cacheDOM('payments-view').style.display = 'block';
+    title.innerText = 'Payments';
+    loadPaymentsReport();
+  } else if (sectionName === 'expenses') {
+    cacheDOM('expenses-view').style.display = 'block';
+    title.innerText = 'Daily Expenses';
+    topButtons.style.display = 'flex';
+    cacheDOM('main-action-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Add Expense';
+    cacheDOM('main-action-btn').onclick = openExpenseModal;
+    loadExpenses();
+  } else if (sectionName === 'procedures') {
+    cacheDOM('procedures-view').style.display = 'block';
+    title.innerText = 'Procedures';
+    topButtons.style.display = 'flex';
+    cacheDOM('main-action-btn').innerHTML = '<i class="fa-solid fa-plus"></i> Add Procedure';
+    cacheDOM('main-action-btn').onclick = openProcedureMasterModal;
+    loadProcedures();
+  } else if (sectionName === 'visitProcedures') {
+    cacheDOM('visitProcedures-view').style.display = 'block';
+    title.innerText = 'Visit Procedures';
+    loadAllVisitProcedures();
+  } else if (sectionName === 'inventory') {
+    cacheDOM('inventory-view').style.display = 'block';
+    title.innerText = 'Inventory';
+  } else if (sectionName === 'attendance') {
+    cacheDOM('attendance-view').style.display = 'block';
+    title.innerText = 'Attendance';
+    loadAttendancePage();
+  } else if (sectionName === 'salary') {
+    cacheDOM('salary-view').style.display = 'block';
+    title.innerText = 'Salary Rates';
+    loadSalaryPage();
+  }
+}
+
+function openPatientModal() { cacheDOM('patientModal').style.display = 'block'; }
+
+function attendanceBranchChanged() {
+  const branch = cacheDOM('attendanceBranch').value;
+  if (!branch) {
+    cacheDOM('attendanceStaffList').style.display = 'none';
+    cacheDOM('attendanceStaffPlaceholder').style.display = 'block';
+    cacheDOM('attendanceStaffPlaceholder').innerText = 'Select a branch to load staff and clock attendance.';
+    loadAttendanceStaff('');
+    loadAttendanceRecords();
+    return;
+  }
+
+  cacheDOM('attendanceStaffList').style.display = 'block';
+  cacheDOM('attendanceStaffPlaceholder').style.display = 'none';
+  loadAttendanceStaffList(branch);
+  loadAttendanceStaff(branch);
+  loadAttendanceRecords();
+}
+
+function attendanceStaffChanged() {
+  loadAttendanceRecords();
+}
+
+function loadAttendanceStaffList(branch) {
+  const tbody = cacheDOM('attendanceStaffTableBody');
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px">Loading staff...</td></tr>';
+
+  google.script.run
+    .withSuccessHandler(function (staffList) {
+      tbody.innerHTML = '';
+      if (!staffList || !staffList.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No staff found for this branch.</td></tr>';
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+      staffList.forEach(function (staff) {
+        const tr = document.createElement('tr');
+        const nameTd = document.createElement('td');
+        nameTd.textContent = staff.name;
+
+        const statusTd = document.createElement('td');
+        statusTd.id = 'status-' + staff.name.replace(/\s+/g, '-');
+        statusTd.textContent = 'Checking...';
+
+        const lastActionTd = document.createElement('td');
+        lastActionTd.id = 'last-' + staff.name.replace(/\s+/g, '-');
+        lastActionTd.textContent = '—';
+
+        const actionTd = document.createElement('td');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'form-button';
+        button.id = 'btn-' + staff.name.replace(/\s+/g, '-');
+        button.dataset.staff = staff.name;
+        button.dataset.branch = branch;
+        button.dataset.action = 'pending';
+        button.textContent = 'Loading...';
+        button.disabled = true;
+        button.onclick = function () { performAttendanceAction(branch, staff.name, button, statusTd, lastActionTd); };
+        actionTd.appendChild(button);
+
+        tr.appendChild(nameTd);
+        tr.appendChild(statusTd);
+        tr.appendChild(lastActionTd);
+        tr.appendChild(actionTd);
+        frag.appendChild(tr);
+
+        checkStaffStatus(branch, staff.name);
+      });
+      tbody.appendChild(frag);
+    })
+    .withFailureHandler(function (err) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red">Error loading staff: ' + escapeHtml(err.message) + '</td></tr>';
+    })
+    .getStaffByBranch(branch);
+}
+
+function checkStaffStatus(branch, staff) {
+  google.script.run
+    .withSuccessHandler(function (result) {
+      const statusTd = cacheDOM('status-' + staff.replace(/\s+/g, '-'));
+      const button = cacheDOM('btn-' + staff.replace(/\s+/g, '-'));
+      const lastActionTd = cacheDOM('last-' + staff.replace(/\s+/g, '-'));
+      if (!statusTd || !button || !lastActionTd) return;
+
+      if (result && result.open) {
+        statusTd.textContent = 'Clocked In';
+        button.dataset.action = 'clock-out';
+        button.textContent = 'Clock Out';
+        button.disabled = false;
+        lastActionTd.textContent = 'Open shift';
+      } else {
+        statusTd.textContent = 'Not clocked in';
+        button.dataset.action = 'clock-in';
+        button.textContent = 'Clock In';
+        button.disabled = false;
+        lastActionTd.textContent = '—';
+      }
+    })
+    .withFailureHandler(function (err) {
+      const statusTd = cacheDOM('status-' + staff.replace(/\s+/g, '-'));
+      const button = cacheDOM('btn-' + staff.replace(/\s+/g, '-'));
+      if (statusTd) statusTd.textContent = 'Status unavailable';
+      if (button) {
+        button.textContent = 'Retry';
+        button.dataset.action = 'pending';
+        button.disabled = false;
+      }
+      console.warn('Status check failed for ' + staff + ': ' + err.message);
+    })
+    .getOpenAttendanceStatus(branch, staff);
+}
+
+function performAttendanceAction(branch, staff, button, statusTd, lastActionTd) {
+  let action = button.dataset.action;
+  if (!action || action === 'pending') {
+    const label = (button.textContent || '').toLowerCase();
+    action = label.includes('out') ? 'clock-out' : 'clock-in';
+  }
+
+  const nextState = action === 'clock-in' ? { action: 'clock-out', text: 'Clock Out' } : { action: 'clock-in', text: 'Clock In' };
+  const pendingText = action === 'clock-in' ? 'Clocking in...' : 'Clocking out...';
+
+  button.dataset.action = 'pending';
+  button.textContent = pendingText;
+  button.disabled = true;
+
+  const resetButton = function (fallbackAction, fallbackText) {
+    button.dataset.action = fallbackAction;
+    button.textContent = fallbackText;
+    button.disabled = false;
+    if (statusTd) statusTd.textContent = 'Status unavailable';
+  };
+
+  const timeoutId = setTimeout(function () {
+    if (button.disabled && button.dataset.action === 'pending') {
+      resetButton(action, action === 'clock-in' ? 'Clock In' : 'Clock Out');
+      console.warn('Attendance action timed out for', staff, branch);
+    }
+  }, 12000);
+
+  const onSuccess = function (result) {
+    clearTimeout(timeoutId);
+    const timeKey = action === 'clock-in' ? 'timeIn' : 'timeOut';
+    const timeStr = new Date(result[timeKey]).toLocaleString('en-PH', { hour12: true, hour: '2-digit', minute: '2-digit' });
+    button.dataset.action = nextState.action;
+    button.textContent = nextState.text;
+    button.disabled = false;
+    if (statusTd) statusTd.textContent = action === 'clock-in' ? 'Clocked In' : 'Not clocked in';
+    if (lastActionTd) {
+      lastActionTd.textContent = action === 'clock-in'
+        ? 'Clocked in at ' + timeStr
+        : 'Clocked out at ' + timeStr;
+    }
+    setTimeout(function () { checkStaffStatus(branch, staff); loadAttendanceRecords(); }, 300);
+  };
+
+  const onFailure = function (err) {
+    clearTimeout(timeoutId);
+    alert('Error: ' + err.message);
+    resetButton(action, action === 'clock-in' ? 'Clock In' : 'Clock Out');
+    setTimeout(function () { checkStaffStatus(branch, staff); }, 200);
+  };
+
+  const call = action === 'clock-in'
+    ? google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onFailure).clockInAttendance(staff, branch, '')
+    : google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onFailure).clockOutAttendance(staff, branch);
+}
+
+
+
+
+
+
+
+
+
+function loadAttendancePage() {
+  const start = cacheDOM('attendanceStart');
+  const end = cacheDOM('attendanceEnd');
+
+  if (!start.value || !end.value) {
+    const today = new Date().toISOString().slice(0, 10);
+    start.value = today;
+    end.value = today;
+  }
+
+  const branch = cacheDOM('attendanceBranch').value || '';
+  if (branch) {
+    cacheDOM('attendanceStaffList').style.display = 'block';
+    cacheDOM('attendanceStaffPlaceholder').style.display = 'none';
+    loadAttendanceStaffList(branch);
+  } else {
+    cacheDOM('attendanceStaffList').style.display = 'none';
+    cacheDOM('attendanceStaffPlaceholder').style.display = 'block';
+  }
+  
+  loadAttendanceStaff(branch);
+  loadAttendanceRecords();
+}
+
+function refreshAttendanceRecords() {
+  loadAttendanceRecords();
+  setTimeout(loadAttendanceRecords, 300);
+}
+
+function loadAttendanceStaff(branch) {
+  google.script.run
+    .withSuccessHandler(function (staffList) {
+      window.attendanceStaffList = staffList || [];
+      const staffSelect = cacheDOM('attendanceStaffFilter');
+      const salaryStaffSelect = cacheDOM('salaryStaffFilter');
+      if (staffSelect) {
+        staffSelect.innerHTML = '<option value="">All Staff</option>';
+      }
+      if (salaryStaffSelect) {
+        salaryStaffSelect.innerHTML = '<option value="">All Staff</option>';
+      }
+      staffList.forEach(function (item) {
+        if (staffSelect) {
+          const option = document.createElement('option');
+          option.value = item.name;
+          option.textContent = item.name;
+          staffSelect.appendChild(option);
+        }
+      });
+      if (salaryStaffSelect) {
+        staffList.forEach(function (item) {
+          const option = document.createElement('option');
+          option.value = item.name;
+          option.textContent = item.name + ' (' + item.branch + ')';
+          salaryStaffSelect.appendChild(option);
+        });
+      }
+    })
+    .withFailureHandler(err => {
+      console.error(err);
+      alert('Could not load staff list: ' + err.message);
+    })
+    .getStaffByBranch(branch);
+}
+
+function loadSalarySelects() {
+  const salaryStaff = cacheDOM('salaryStaffFilter');
+  const salaryStaff2 = cacheDOM('salaryStaffFilter2');
+  if (!salaryStaff || !salaryStaff2) return;
+  salaryStaff.innerHTML = '<option value="">All Staff</option>';
+  salaryStaff2.innerHTML = '<option value="">All Staff</option>';
+  (window.attendanceStaffList || []).forEach(function (item) {
+    const option = document.createElement('option');
+    option.value = item.name;
+    option.textContent = item.name + ' (' + item.branch + ')';
+    salaryStaff.appendChild(option.cloneNode(true));
+    salaryStaff2.appendChild(option);
+  });
+}
+
+function saveSalaryRate() {
+  const branch = cacheDOM('salaryRateBranch').value;
+  const staff = cacheDOM('salaryStaffName').value.trim();
+  const rateText = cacheDOM('salaryHourlyRate').value.replace(/[^0-9]/g, '');
+  if (!branch || !staff) {
+    alert('Select branch and enter the staff name before saving the salary rate.');
+    return;
+  }
+  const rate = Number(rateText) || 0;
+  google.script.run
+    .withSuccessHandler(function () {
+      alert('Daily rate saved.');
+      loadSalaryTable();
+      loadSalarySelects();
+    })
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .saveStaffSalary({ branch: branch, staff: staff, hourlyRate: rate });
+}
+
+function loadSalaryPage() {
+  loadAttendanceStaff('');
+  loadSalarySelects();
+  loadSalaryTable();
+}
+
+function loadSalaryTable() {
+  const branch = cacheDOM('salaryRateBranch').value || '';
+  const staffFilter = cacheDOM('salaryStaffFilter2').value || '';
+  google.script.run
+    .withSuccessHandler(function (list) {
+      const tbody = cacheDOM('salaryTableBody');
+      tbody.innerHTML = '';
+      if (!list || !list.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">No salary records found.</td></tr>';
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      list
+        .filter(item => !staffFilter || item.name === staffFilter)
+        .forEach(function (item) {
+          const tr = document.createElement('tr');
+          const branchTd = document.createElement('td');
+          branchTd.textContent = item.branch;
+          const nameTd = document.createElement('td');
+          nameTd.textContent = item.name;
+          const rateTd = document.createElement('td');
+          rateTd.textContent = '₱' + Number(item.hourlyRate).toLocaleString('en-PH');
+          const actionTd = document.createElement('td');
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'save-btn btn-secondary';
+          button.style.cssText = 'padding:6px 10px;font-size:12px';
+          button.textContent = 'Edit';
+          button.addEventListener('click', function () {
+            editSalaryRate(item.name, item.branch, Number(item.hourlyRate));
+          });
+          actionTd.appendChild(button);
+          tr.appendChild(branchTd);
+          tr.appendChild(nameTd);
+          tr.appendChild(rateTd);
+          tr.appendChild(actionTd);
+          frag.appendChild(tr);
+        });
+      tbody.appendChild(frag);
+    })
+    .withFailureHandler(err => alert('Could not load salary table: ' + err.message))
+    .getStaffWithSalary(branch);
+}
+
+function editSalaryRate(name, branch, hourlyRate) {
+  cacheDOM('salaryRateBranch').value = branch;
+  loadAttendanceStaff('');
+  cacheDOM('salaryStaffName').value = decodeURIComponent(name);
+  cacheDOM('salaryHourlyRate').value = hourlyRate ? '₱' + Number(hourlyRate).toLocaleString('en-PH') : '';
+}
+
+
+
+function attendanceDateChanged() {
+  loadAttendanceRecords();
+}
+
+function loadAttendanceRecords() {
+  const branch = cacheDOM('attendanceBranch').value;
+  const staff = cacheDOM('attendanceStaffFilter').value;
+  const start = cacheDOM('attendanceStart').value;
+  const end = cacheDOM('attendanceEnd').value;
+  
+  const tbody = cacheDOM('attendanceTableBody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px">Loading records...</td></tr>';
+  
+  google.script.run
+    .withSuccessHandler(function (records) {
+      tbody.innerHTML = '';
+      if (!records || !records.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:20px">No attendance records found.</td></tr>';
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      records.forEach(function (record) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + escapeHtml(record.date) + '</td>' +
+          '<td>' + escapeHtml(record.branch) + '</td>' +
+          '<td>' + escapeHtml(record.staff) + '</td>' +
+          '<td>' + escapeHtml(record.timeIn) + '</td>' +
+          '<td>' + escapeHtml(record.timeOut) + '</td>' +
+          '<td>' + (record.hoursWorked ? record.hoursWorked.toFixed(2) : '—') + '</td>' +
+          '<td>' + escapeHtml(record.notes) + '</td>';
+        frag.appendChild(tr);
+      });
+      tbody.appendChild(frag);
+    })
+    .withFailureHandler(function(err) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:red;padding:20px">Error: ' + escapeHtml(err.message) + '</td></tr>';
+      console.error('Attendance records error:', err);
+    })
+    .getAttendanceRecords(start, end, branch, staff);
+}
+
+function loadSalaryReport() {
+  if (!appAccess.canViewSalaryReport) {
+    alert('You do not have access to salary reports.');
+    return;
+  }
+  const start = cacheDOM('salaryStart').value;
+  const end = cacheDOM('salaryEnd').value;
+  const branch = cacheDOM('salaryBranch').value;
+  const staff = cacheDOM('salaryStaffFilter').value;
+  google.script.run
+    .withSuccessHandler(function (report) {
+      const reportBody = cacheDOM('salaryReportBody');
+      const summaryBody = cacheDOM('salarySummaryBody');
+      const reportTable = cacheDOM('salaryReportTable');
+      const summaryTable = cacheDOM('salarySummaryTable');
+      reportBody.innerHTML = '';
+      summaryBody.innerHTML = '';
+      if (!report || !report.rows.length) {
+        reportBody.innerHTML = '<tr><td colspan="7" style="text-align:center">No salary records found for this range.</td></tr>';
+        reportTable.style.display = 'block';
+        summaryTable.style.display = 'none';
+      } else {
+        const frag = document.createDocumentFragment();
+        report.rows.forEach(function (row) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + escapeHtml(row.date) + '</td>' +
+            '<td>' + escapeHtml(row.branch) + '</td>' +
+            '<td>' + escapeHtml(row.staff) + '</td>' +
+            '<td>' + escapeHtml(String(row.hoursWorked)) + '</td>' +
+            '<td>₱' + Number(row.hourlyRate).toLocaleString('en-PH') + '</td>' +
+            '<td>₱' + Number(row.pay).toLocaleString('en-PH') + '</td>' +
+            '<td>' + escapeHtml(row.notes) + '</td>';
+          frag.appendChild(tr);
+        });
+        reportBody.appendChild(frag);
+        reportTable.style.display = 'block';
+
+        if (report.staffSummary && report.staffSummary.length) {
+          const frag2 = document.createDocumentFragment();
+          report.staffSummary.forEach(function (item) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + escapeHtml(item.staff) + '</td>' +
+              '<td>' + escapeHtml(item.branch) + '</td>' +
+              '<td>₱' + Number(item.hourlyRate).toLocaleString('en-PH') + '</td>' +
+              '<td>' + escapeHtml(String(item.hoursWorked)) + '</td>' +
+              '<td>₱' + Number(item.pay).toLocaleString('en-PH') + '</td>';
+            frag2.appendChild(tr);
+          });
+          summaryBody.appendChild(frag2);
+          summaryTable.style.display = 'block';
+        } else {
+          summaryTable.style.display = 'none';
+        }
+      }
+      cacheDOM('salaryTotalHours').textContent = report ? String(report.totalHours) : '0';
+      cacheDOM('salaryTotalPay').textContent = '₱' + (report ? Number(report.totalPay).toLocaleString('en-PH') : '0');
+    })
+    .withFailureHandler(err => alert('Could not load salary report: ' + err.message))
+    .getSalaryReport(start, end, branch, staff);
+}
+
+function exportSalaryReport() {
+  const start = cacheDOM('salaryStart').value;
+  const end = cacheDOM('salaryEnd').value;
+  const branch = cacheDOM('salaryBranch').value;
+  const staff = cacheDOM('salaryStaffFilter').value;
+  google.script.run
+    .withSuccessHandler(function () {
+      alert('Salary report exported to "Salary Reports" sheet.');
+    })
+    .withFailureHandler(err => alert('Error exporting: ' + err.message))
+    .exportSalaryReportToSheet(start, end, branch, staff);
+}
+
+function closePatientModal() { cacheDOM('patientModal').style.display = 'none'; }
+
+function openEditModal(patient) {
+  cacheDOM('editModal').style.display = 'block';
+  cacheDOM('editRow').value = patient.row;
+  cacheDOM('editFirstName').value = patient.firstName || '';
+  cacheDOM('editLastName').value = patient.lastName || '';
+  if (patient.dob && patient.dob.includes('/')) {
+    const parts = patient.dob.split('/');
+    cacheDOM('editDob').value = parts[2] + '-' + parts[0].padStart(2, '0') + '-' + parts[1].padStart(2, '0');
+  } else {
+    cacheDOM('editDob').value = '';
+  }
+  cacheDOM('editGender').value = patient.gender || '';
+}
+
+function closeEditModal() { cacheDOM('editModal').style.display = 'none'; }
+
+function savePatientEdits() {
+  const firstName = cacheDOM('editFirstName').value.trim();
+  const lastName = cacheDOM('editLastName').value.trim();
+  const dob = cacheDOM('editDob').value;
+  const gender = cacheDOM('editGender').value;
+  const row = Number(cacheDOM('editRow').value);
+
+  // Enhanced validation
+  if (!firstName) {
+    alert('Please enter the first name');
+    cacheDOM('editFirstName').focus();
+    return;
+  }
+  if (!lastName) {
+    alert('Please enter the last name');
+    cacheDOM('editLastName').focus();
+    return;
+  }
+  if (!dob) {
+    alert('Please select a date of birth');
+    cacheDOM('editDob').focus();
+    return;
+  }
+  if (!gender) {
+    alert('Please select a gender');
+    cacheDOM('editGender').focus();
+    return;
+  }
+
+  // Check if DOB is not in the future
+  const dobDate = new Date(dob);
+  const today = new Date();
+  if (dobDate > today) {
+    alert('Date of birth cannot be in the future');
+    cacheDOM('editDob').focus();
+    return;
+  }
+
+  const data = { row, firstName, lastName, dob, gender };
+
+  google.script.run
+    .withSuccessHandler(() => {
+      closeEditModal();
+      loadPatients();
+      showToast('Patient updated successfully', 'success');
+    })
+    .withFailureHandler(err => {
+      alert('Error updating patient: ' + err.message);
+    })
+    .updatePatient(data);
+}
+
+function removePatient() {
+  const row = Number(cacheDOM('editRow').value);
+  if (!row || !confirm('Delete this patient record?')) return;
+  google.script.run
+    .withSuccessHandler(() => {
+      closeEditModal();
+      loadPatients();
+      alert('Patient deleted.');
+    })
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .deletePatient(row);
+}
+
+function openVisitModal() {
+  cacheDOM('visitModal').style.display = 'block';
+  lastPatientMatches = [];
+  cacheDOM('patientList').innerHTML = '';
+  selectedPatientId = null;
+  cacheDOM('visitDOB').value = '';
+  cacheDOM('visitAge').value = '';
+  const now = new Date();
+  cacheDOM('visitDateTime').value = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function closeVisitModal() { cacheDOM('visitModal').style.display = 'none'; }
+
+function shortcutToVisit() {
+  const firstName = cacheDOM('editFirstName').value;
+  const lastName = cacheDOM('editLastName').value;
+  closeEditModal();
+  openVisitModal();
+  const full = (firstName + ' ' + lastName).trim();
+  cacheDOM('searchFullName').value = full;
+  if (full.length >= 2) {
+    google.script.run
+      .withSuccessHandler(function (matches) {
+        lastPatientMatches = matches || [];
+        const dl = cacheDOM('patientList');
+        dl.innerHTML = '';
+        lastPatientMatches.forEach(m => {
+          const o = document.createElement('option');
+          o.value = (m.firstName || '') + ' ' + (m.lastName || '');
+          dl.appendChild(o);
+        });
+        handleSearch(full);
+      })
+      .searchPatientsMini(full);
+  } else {
+    handleSearch(full);
+  }
+}
+
+function handleSearch(val) {
+  const t = String(val).trim().toLowerCase();
+  const match = lastPatientMatches.find(m => ((m.firstName || '') + ' ' + (m.lastName || '')).trim().toLowerCase() === t)
+    || allPatientsData.find(p => ((p.firstName || '') + ' ' + (p.lastName || '')).trim().toLowerCase() === t);
+  if (match) {
+    cacheDOM('visitDOB').value = match.dob || '';
+    cacheDOM('visitAge').value = match.age || '';
+    selectedPatientId = match.id;
+  } else {
+    cacheDOM('visitDOB').value = '';
+    cacheDOM('visitAge').value = '';
+    selectedPatientId = null;
+  }
+}
+
+function savePatient() {
+  const firstName = cacheDOM('firstName').value.trim();
+  const lastName = cacheDOM('lastName').value.trim();
+  const dob = cacheDOM('dob').value;
+  const gender = cacheDOM('gender').value;
+
+  // Enhanced validation
+  if (!firstName) {
+    alert('Please enter the first name');
+    cacheDOM('firstName').focus();
+    return;
+  }
+  if (!lastName) {
+    alert('Please enter the last name');
+    cacheDOM('lastName').focus();
+    return;
+  }
+  if (!dob) {
+    alert('Please select a date of birth');
+    cacheDOM('dob').focus();
+    return;
+  }
+  if (!gender) {
+    alert('Please select a gender');
+    cacheDOM('gender').focus();
+    return;
+  }
+
+  // Check if DOB is not in the future
+  const dobDate = new Date(dob);
+  const today = new Date();
+  if (dobDate > today) {
+    alert('Date of birth cannot be in the future');
+    cacheDOM('dob').focus();
+    return;
+  }
+
+  const data = { firstName, lastName, dob, gender };
+  const btn = document.querySelector('#patientModal .save-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+  google.script.run
+    .withSuccessHandler(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      closePatientModal();
+      // Clear form
+      cacheDOM('firstName').value = '';
+      cacheDOM('lastName').value = '';
+      cacheDOM('dob').value = '';
+      cacheDOM('gender').value = '';
+      loadPatients();
+      // Show success message
+      showToast('Patient added successfully', 'success');
+    })
+    .withFailureHandler(err => {
+      alert('Error saving patient: ' + err.message);
+      btn.disabled = false;
+      btn.textContent = originalText;
+    })
+    .savePatient(data);
+}
+
+function saveVisit() {
+  if (!selectedPatientId) {
+    alert('Please select a patient from the dropdown list by typing their full name.');
+    cacheDOM('searchFullName').focus();
+    return;
+  }
+
+  const branchLocation = cacheDOM('branchLocation').value;
+  if (!branchLocation) {
+    alert('Please select a branch location');
+    cacheDOM('branchLocation').focus();
+    return;
+  }
+
+  const data = {
+    patientId: selectedPatientId,
+    visitTime: cacheDOM('visitDateTime').value,
+    branchLocation: branchLocation,
+    remarks: cacheDOM('remarks').value.trim()
+  };
+
+  const btn = document.querySelector('#visitModal .save-btn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Adding Visit...';
+
+  google.script.run
+    .withSuccessHandler(() => {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      closeVisitModal();
+      loadVisits();
+      loadPatients();
+      showToast('Visit added successfully', 'success');
+    })
+    .withFailureHandler(err => {
+      alert('Error adding visit: ' + err.message);
+      btn.disabled = false;
+      btn.textContent = originalText;
+    })
+    .saveVisit(data);
+}
+
+function loadVisits() {
+  const tableBody = cacheDOM('visitTable');
+  if (tableBody) tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px"><i class="fa-solid fa-spinner fa-spin"></i> Loading visits...</td></tr>';
+  google.script.run
+    .withSuccessHandler(showVisits)
+    .withFailureHandler(err => {
+      console.error(err);
+      if (tableBody) tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:20px"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load visits: ' + err.message + '</td></tr>';
+      alert('Could not load visits: ' + err.message);
+    })
+    .getVisits();
+}
+
+function showVisits(data) {
+  allVisits = data || [];
+  const tableBody = cacheDOM('visitTable');
+  tableBody.innerHTML = '';
+  if (!allVisits.length) {
+    tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center">No visit records found</td></tr>';
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  allVisits.forEach(v => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => openVisitEditModal(v);
+    let paymentBadge = '';
+    if (v.paymentStatus === 'PAID') {
+      paymentBadge = '<span style="background:#A9BD93;color:#fff;padding:6px 12px;border-radius:8px;font-weight:700;font-size:12px;display:inline-block">PAID</span>';
+    } else if (v.paymentStatus === 'PAID WITH BALANCE') {
+      paymentBadge = '<span style="background:#f59e0b;color:#fff;padding:6px 12px;border-radius:8px;font-weight:700;font-size:12px;display:inline-block">PAID WITH BALANCE</span>';
+    }
+    const sessionBadge = v.sessionStatus === 'SESSIONS COMPLETE'
+      ? '<span style="background:#16a34a;color:#fff;padding:4px 8px;border-radius:8px;font-size:11px;display:inline-block;margin-left:8px">SESSIONS COMPLETE</span>'
+      : v.sessionStatus === 'SESSIONS REMAINING'
+        ? '<span style="background:#2563eb;color:#fff;padding:4px 8px;border-radius:8px;font-size:11px;display:inline-block;margin-left:8px">SESSIONS REMAINING</span>'
+        : '';
+    tr.innerHTML = '<td>' + escapeHtml(v.visitId) + '</td><td>' + escapeHtml(v.patientName) + '</td><td>' + escapeHtml(v.date) + '</td><td>' + escapeHtml(v.branch) + '</td><td>' + paymentBadge + sessionBadge + '</td>';
+    frag.appendChild(tr);
+  });
+  tableBody.appendChild(frag);
+}
+
+window.onload = function () {
+  google.script.run
+    .withSuccessHandler(function (access) {
+      try {
+        applyWebAppAccess(access);
+        setupNavigation();
+        setupSearch();
+      } catch (setupErr) {
+        console.error(setupErr);
+        alert('Part of the page setup failed: ' + setupErr.message + '. Patient list will still try to load.');
+      }
+      loadPatients();
+      try {
+        wireVisitNameSearch();
+      } catch (e) {
+        console.error(e);
+      }
+    })
+    .withFailureHandler(function (err) {
+      console.error(err);
+      applyWebAppAccess({ mode: 'full', lockBranch: '', canViewPaymentsReport: true, email: '' });
+      try {
+        setupNavigation();
+        setupSearch();
+      } catch (setupErr) {
+        console.error(setupErr);
+      }
+      loadPatients();
+      try {
+        wireVisitNameSearch();
+      } catch (e) {
+        console.error(e);
+      }
+    })
+    .getWebAppAccess();
+};
+
+function wireVisitNameSearch() {
+  const visitNameInput = cacheDOM('searchFullName');
+  if (!visitNameInput) return;
+  visitNameInput.addEventListener('input', debounce(function () {
+    const v = visitNameInput.value.trim();
+    if (v.length < 2) {
+      lastPatientMatches = [];
+      cacheDOM('patientList').innerHTML = '';
+      selectedPatientId = null;
+      cacheDOM('visitDOB').value = '';
+      cacheDOM('visitAge').value = '';
+      return;
+    }
+    google.script.run
+      .withSuccessHandler(function (matches) {
+        lastPatientMatches = matches || [];
+        const dl = cacheDOM('patientList');
+        dl.innerHTML = '';
+        lastPatientMatches.forEach(m => {
+          const o = document.createElement('option');
+          o.value = (m.firstName || '') + ' ' + (m.lastName || '');
+          dl.appendChild(o);
+        });
+      })
+      .withFailureHandler(err => console.error(err))
+      .searchPatientsMini(v);
+  }, 280));
+  visitNameInput.addEventListener('change', function () { handleSearch(this.value); });
+  visitNameInput.addEventListener('blur', function () { handleSearch(this.value); });
+}
+
+function setupNavigation() {
+  document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
+    btn.addEventListener('click', function () {
+      showSection(this.dataset.section, this);
+    });
+  });
+}
+
+function setupSearch() {
+  const patientInput = cacheDOM('patientSearchInput');
+  if (patientInput) {
+    patientInput.addEventListener('keyup', debounce(() => filterTable(patientInput.value), 300));
+  }
+  const visitSearch = cacheDOM('visitSearch');
+  if (visitSearch) {
+    visitSearch.addEventListener('keyup', debounce(filterVisitsTable, 300));
+  }
+  const visitDateFilter = cacheDOM('visitDateFilter');
+  if (visitDateFilter) {
+    visitDateFilter.addEventListener('change', filterVisitsTable);
+  }
+  const procInput = cacheDOM('proceduresSearch');
+  if (procInput) {
+    procInput.addEventListener('keyup', debounce(() => filterProceduresTable(procInput.value), 300));
+  }
+  const vpcInput = cacheDOM('visitProcSearch');
+  if (vpcInput) {
+    vpcInput.addEventListener('keyup', debounce(() => filterVisitProceduresTable(vpcInput.value), 300));
+  }
+}
+
+function visitDateToYmd(visitDateText, selectedYmd) {
+  if (!selectedYmd) return true;
+  const parsed = new Date(visitDateText);
+  if (!isNaN(parsed.getTime())) {
+    const y = parsed.getFullYear();
+    const m = String(parsed.getMonth() + 1).padStart(2, '0');
+    const d = String(parsed.getDate()).padStart(2, '0');
+    return (y + '-' + m + '-' + d) === selectedYmd;
+  }
+  return visitDateText.indexOf(selectedYmd) !== -1;
+}
+
+function filterVisitsTable() {
+  const searchText = cacheDOM('visitSearch').value.toLowerCase().trim();
+  const selectedDate = cacheDOM('visitDateFilter').value;
+  const rows = document.querySelectorAll('#visitTable tr');
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    if (!row.cells || row.cells.length < 5) return;
+
+    const visitId = row.cells[0].innerText.toLowerCase();
+    const patientName = row.cells[1].innerText.toLowerCase();
+    const visitDateText = row.cells[2].innerText.trim();
+    const branch = row.cells[3].innerText.toLowerCase();
+
+    const matchesSearch = !searchText ||
+      visitId.includes(searchText) ||
+      patientName.includes(searchText) ||
+      branch.includes(searchText);
+
+    const matchesDate = visitDateToYmd(visitDateText, selectedDate);
+
+    const show = matchesSearch && matchesDate;
+    row.style.display = show ? '' : 'none';
+    if (show) visibleCount++;
+  });
+
+  // Update search result count
+  const searchContainer = document.querySelector('#visits-view .search-container');
+  if (searchContainer) {
+    let countEl = searchContainer.querySelector('.search-count');
+    if (!countEl) {
+      countEl = document.createElement('span');
+      countEl.className = 'search-count';
+      countEl.style.cssText = 'font-size:12px;color:var(--text-muted);margin-left:10px;';
+      searchContainer.appendChild(countEl);
+    }
+    const totalFilters = (searchText ? 1 : 0) + (selectedDate ? 1 : 0);
+    if (totalFilters > 0) {
+      countEl.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
+    } else {
+      countEl.remove();
+    }
+  }
+}
+
+function openVisitEditModal(v) {
+  currentLoadingVisitId = v.visitId;
+  cacheDOM('editVisitModal').style.display = 'block';
+  cacheDOM('visitProcedureTable').innerHTML = '';
+  cacheDOM('visitTotalPrice').value = '';
+  cacheDOM('displayAmountPaid').value = '';
+  cacheDOM('displayBalance').value = '';
+  cacheDOM('displayPaymentMethod').value = '';
+  cacheDOM('displayTipAmount').value = '';
+  cacheDOM('displayTipMethod').value = '';
+  cacheDOM('editVisitId').value = v.visitId;
+  loadVisitProcedures(v.visitId);
+  cacheDOM('editVisitPatient').value = v.patientName;
+  cacheDOM('editVisitDate').value = v.date;
+  cacheDOM('editVisitBranch').value = v.branch;
+  cacheDOM('editVisitRemarks').value = v.remarks || '';
+  cacheDOM('displayAmountPaid').value = v.amountPaid > 0 ? '₱' + Number(v.amountPaid).toLocaleString('en-PH') : '';
+  cacheDOM('displayBalance').value = v.balance > 0 ? '₱' + Number(v.balance).toLocaleString('en-PH') : '₱0';
+  const paymentBtn = cacheDOM('paymentBtn');
+  if (v.paymentStatus === 'PAID') {
+    paymentBtn.textContent = 'PAID';
+    paymentBtn.style.background = '#16a34a';
+  } else if (v.paymentStatus === 'PAID WITH BALANCE') {
+    paymentBtn.textContent = 'Make Another Payment';
+    paymentBtn.style.background = '#f59e0b';
+  } else {
+    paymentBtn.textContent = 'Make Payment';
+    paymentBtn.style.background = '#0f4d2f';
+  }
+  google.script.run
+    .withSuccessHandler(function (payment) {
+      if (currentLoadingVisitId !== v.visitId) return;
+      cacheDOM('displayAmountPaid').value = payment.amountPaid || '';
+      cacheDOM('displayPaymentMethod').value = payment.method || '';
+      cacheDOM('displayTipAmount').value = payment.tipAmount || '';
+      cacheDOM('displayTipMethod').value = payment.tipMethod || '';
+    })
+    .withFailureHandler(err => console.error(err))
+    .getPaymentDetails(v.visitId);
+}
+
+function closeEditVisitModal() { cacheDOM('editVisitModal').style.display = 'none'; }
+
+function updateVisitRecord() {
+  const data = {
+    visitId: cacheDOM('editVisitId').value,
+    date: cacheDOM('editVisitDate').value,
+    branch: cacheDOM('editVisitBranch').value,
+    remarks: cacheDOM('editVisitRemarks').value
+  };
+  google.script.run
+    .withSuccessHandler(() => {
+      closeEditVisitModal();
+      loadVisits();
+      alert('Visit updated!');
+    })
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .updateVisit(data);
+}
+
+function removeVisit() {
+  const visitId = cacheDOM('editVisitId').value;
+  if (!confirm('Delete this visit?')) return;
+  google.script.run
+    .withSuccessHandler(() => {
+      closeEditVisitModal();
+      loadVisits();
+      alert('Visit deleted!');
+    })
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .deleteVisit(visitId);
+}
+
+function openProcedureModal() {
+  cacheDOM('editVisitModal').style.display = 'none';
+  cacheDOM('procedureModal').style.display = 'block';
+  cacheDOM('procedureVisitId').value = cacheDOM('editVisitId').value;
+  clearProcedureForm();
+  const branch = cacheDOM('editVisitBranch').value;
+  loadStaff(branch);
+}
+
+function closeProcedureModal() {
+  cacheDOM('procedureModal').style.display = 'none';
+  cacheDOM('editVisitModal').style.display = 'block';
+}
+
+function clearProcedureForm() {
+  cacheDOM('procedureRowIndex').value = '';
+  cacheDOM('procedureBundleId').value = '';
+  cacheDOM('procedureType').value = '';
+  cacheDOM('procedureName').innerHTML = '<option value="">Select Procedure</option>';
+  cacheDOM('procedureVariant').value = '';
+  cacheDOM('procedureSession').value = '1';
+  cacheDOM('procedureTotalSessions').value = '1';
+  cacheDOM('procedurePrice').value = '';
+}
+
+function saveProcedure() {
+  const selectedStaff = Array.from(document.querySelectorAll('.staffCheckbox:checked')).map(cb => cb.value).join(', ');
+  const btn = cacheDOM('saveProcedureBtn');
+  const rawPrice = cacheDOM('procedurePrice').value.replace(/[₱,]/g, '');
+  const data = {
+    rowIndex: cacheDOM('procedureRowIndex').value,
+    visitId: cacheDOM('procedureVisitId').value,
+    bundleId: cacheDOM('procedureBundleId').value,
+    type: cacheDOM('procedureType').value,
+    name: cacheDOM('procedureName').value,
+    variant: cacheDOM('procedureVariant').value,
+    session: cacheDOM('procedureSession').value,
+    totalSessions: cacheDOM('procedureTotalSessions').value,
+    staff: selectedStaff,
+    price: rawPrice
+  };
+  btn.disabled = true;
+  const isEditing = !!cacheDOM('procedureRowIndex').value;
+  btn.textContent = isEditing ? 'Updating Procedure...' : 'Adding Procedure...';
+  google.script.run
+    .withSuccessHandler(() => {
+      btn.disabled = false;
+      btn.textContent = 'Add Procedure';
+      loadVisitProceduresAndCloseProcedureModal(data.visitId);
+    })
+    .withFailureHandler(err => {
+      alert('Error: ' + err.message);
+      btn.disabled = false;
+      btn.textContent = 'Add Procedure';
+    })
+    .saveProcedure(data);
+}
+
+function loadVisitProceduresAndCloseProcedureModal(visitId) {
+  google.script.run
+    .withSuccessHandler(function (list) {
+      if (currentLoadingVisitId !== visitId) return;
+      const tbody = cacheDOM('visitProcedureTable');
+      tbody.innerHTML = '';
+      let total = 0;
+      const frag = document.createDocumentFragment();
+      list.forEach(function (p) {
+        total += Number(p.price);
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + escapeHtml(p.procedure) + '</td><td>' + escapeHtml(p.date) + '</td><td>' + escapeHtml(p.session) + '</td><td>' + escapeHtml(p.totalSessions) + '</td><td>' + escapeHtml(p.staff) + '</td><td>₱' + Number(p.price).toLocaleString() + '</td>';
+        frag.appendChild(tr);
+      });
+      tbody.appendChild(frag);
+      cacheDOM('visitTotalPrice').value = '₱' + total.toLocaleString();
+      loadPaymentDetails(visitId);
+      closeProcedureModal();
+    })
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .getVisitProcedures(visitId);
+}
+
+function loadProcedureNames(done) {
+  const type = cacheDOM('procedureType').value;
+  const dropdown = cacheDOM('procedureName');
+  dropdown.innerHTML = '<option value="">Loading...</option>';
+  google.script.run
+    .withSuccessHandler(function (list) {
+      dropdown.innerHTML = '<option value="">Select Procedure</option>';
+      (list || []).forEach(function (item) {
+        const option = document.createElement('option');
+        option.value = item;
+        option.textContent = item;
+        dropdown.appendChild(option);
+      });
+      if (typeof done === 'function') done();
+    })
+    .withFailureHandler(err => {
+      dropdown.innerHTML = '<option value="">Select Procedure</option>';
+      alert('Error loading procedures: ' + err.message);
+    })
+    .getProcedureNames(type);
+}
+
+function formatPrice(input) {
+  let value = input.value.replace(/[^0-9]/g, '');
+  input.value = value ? '₱' + Number(value).toLocaleString('en-PH') : '';
+}
+
+function loadStaff(branch) {
+  google.script.run
+    .withSuccessHandler(function (staffList) {
+      const container = cacheDOM('staffChecklist');
+      container.innerHTML = '';
+      container.style.display = 'grid';
+      container.style.gridTemplateColumns = '1fr 1fr';
+      container.style.columnGap = '20px';
+      container.style.rowGap = '12px';
+      if (!staffList.length) {
+        container.innerHTML = 'No staff found';
+        return;
+      }
+      staffList.forEach(function (staff) {
+        const label = document.createElement('label');
+        label.style.cssText = 'display:flex;align-items:center;gap:8px;margin:0;font-weight:500;cursor:pointer';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'staffCheckbox';
+        cb.value = staff.name;
+        cb.style.cssText = 'width:16px;height:16px;margin:0';
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(' ' + staff.name + ' (' + staff.branch + ')'));
+        container.appendChild(label);
+      });
+    })
+    .withFailureHandler(err => { cacheDOM('staffChecklist').innerHTML = 'Could not load staff'; console.error(err); })
+    .getStaffByBranch('');
+}
+
+function loadVisitProcedures(visitId) {
+  const tbody = cacheDOM('visitProcedureTable');
+  if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px"><i class="fa-solid fa-spinner fa-spin"></i> Loading procedures...</td></tr>';
+  google.script.run
+    .withSuccessHandler(function (list) {
+      if (currentLoadingVisitId !== visitId) return;
+      const tbody = cacheDOM('visitProcedureTable');
+      tbody.innerHTML = '';
+      let total = 0;
+      const frag = document.createDocumentFragment();
+      list.forEach(function (p) {
+        total += Number(p.price);
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + escapeHtml(p.procedure) + '</td><td>' + escapeHtml(p.date) + '</td><td>' + escapeHtml(p.session) + '</td><td>' + escapeHtml(p.totalSessions) + '</td><td>' + escapeHtml(p.staff) + '</td><td>₱' + Number(p.price).toLocaleString() + '</td>';
+        frag.appendChild(tr);
+      });
+      tbody.appendChild(frag);
+      cacheDOM('visitTotalPrice').value = '₱' + total.toLocaleString();
+      loadPaymentDetails(visitId);
+    })
+    .withFailureHandler(err => {
+      console.error(err);
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:20px"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load procedures: ' + err.message + '</td></tr>';
+      alert('Error: ' + err.message);
+    })
+    .getVisitProcedures(visitId);
+}
+
+function openPaymentModal() {
+  cacheDOM('paymentModal').style.display = 'block';
+  cacheDOM('paymentTotal').value = cacheDOM('visitTotalPrice').value;
+  cacheDOM('amountPaid').value = '';
+  cacheDOM('paymentMethod').selectedIndex = 0;
+  cacheDOM('tipAmount').value = '';
+  cacheDOM('tipMethod').selectedIndex = 0;
+}
+
+function closePaymentModal() { cacheDOM('paymentModal').style.display = 'none'; }
+
+function savePayment() {
+  const btn = document.querySelector('#paymentModal .save-btn');
+  const total = Number(cacheDOM('paymentTotal').value.replace(/[₱,]/g, ''));
+  const newPaid = Number(cacheDOM('amountPaid').value.replace(/[₱,]/g, ''));
+  const currentPaid = cacheDOM('displayAmountPaid').value || '';
+  const previousPaid = currentPaid.split('+').reduce((sum, amt) => sum + (Number(amt.replace(/[₱,]/g, '').trim()) || 0), 0);
+  const paid = previousPaid + newPaid;
+  const balance = total - paid;
+  const data = {
+    visitId: cacheDOM('editVisitId').value,
+    total: cacheDOM('paymentTotal').value,
+    amountPaid: '₱' + newPaid.toLocaleString('en-PH'),
+    balance: '₱' + balance.toLocaleString('en-PH'),
+    method: cacheDOM('paymentMethod').value,
+    tipAmount: cacheDOM('tipAmount').value,
+    tipMethod: cacheDOM('tipMethod').value
+  };
+  btn.disabled = true;
+  btn.innerText = 'Saving payment details...';
+  google.script.run
+    .withSuccessHandler(function () {
+      const updatedPaidDisplay = cacheDOM('displayAmountPaid').value ? cacheDOM('displayAmountPaid').value + ' + ' + data.amountPaid : data.amountPaid;
+      cacheDOM('displayAmountPaid').value = updatedPaidDisplay;
+      cacheDOM('displayBalance').value = data.balance;
+      const updatedMethod = cacheDOM('displayPaymentMethod').value ? cacheDOM('displayPaymentMethod').value + ', ' + data.method : data.method;
+      cacheDOM('displayPaymentMethod').value = updatedMethod;
+      if (data.tipAmount) {
+        const updatedTip = cacheDOM('displayTipAmount').value ? cacheDOM('displayTipAmount').value + ' + ' + data.tipAmount : data.tipAmount;
+        cacheDOM('displayTipAmount').value = updatedTip;
+      }
+      if (data.tipMethod) {
+        const updatedTipMethod = cacheDOM('displayTipMethod').value ? cacheDOM('displayTipMethod').value + ', ' + data.tipMethod : data.tipMethod;
+        cacheDOM('displayTipMethod').value = updatedTipMethod;
+      }
+      const balanceNumber = Number(data.balance.replace(/[₱,]/g, ''));
+      const status = cacheDOM('paymentStatus');
+      if (balanceNumber === 0) {
+        status.innerText = '✅ PAID';
+        status.style.color = '#16a34a';
+      } else {
+        status.innerText = '🟠 PAID with Balance';
+        status.style.color = '#f59e0b';
+      }
+      btn.disabled = false;
+      btn.innerText = 'Save Payment';
+      closePaymentModal();
+      loadPaymentDetails(data.visitId);
+      loadVisits();
+    })
+    .withFailureHandler(function (err) {
+      alert('Error: ' + err.message);
+      btn.disabled = false;
+      btn.innerText = 'Save Payment';
+    })
+    .savePayment(data);
+}
+
+function loadPaymentDetails(visitId) {
+  google.script.run
+    .withSuccessHandler(function (payment) {
+      if (currentLoadingVisitId !== visitId) return;
+      payment = payment || {};
+      cacheDOM('displayAmountPaid').value = payment.amountPaid || '';
+      const totalText = cacheDOM('visitTotalPrice').value || '0';
+      const total = parseFloat(totalText.replace(/[₱,]/g, '')) || 0;
+      let paid = 0;
+      if (payment.amountPaid) {
+        paid = payment.amountPaid.split('+').reduce((sum, amt) => sum + (parseFloat(amt.replace(/[₱,]/g, '').trim()) || 0), 0);
+      }
+      const balance = Math.max(0, total - paid);
+      cacheDOM('displayBalance').value = '₱' + balance.toLocaleString('en-PH');
+      const paymentBtn = cacheDOM('paymentBtn');
+      if (balance === 0 && paid > 0) {
+        paymentBtn.textContent = 'PAID';
+        paymentBtn.style.background = '#16a34a';
+        paymentBtn.style.color = '#fff';
+      } else if (paid > 0) {
+        paymentBtn.textContent = 'Make Another Payment';
+        paymentBtn.style.background = '#f59e0b';
+        paymentBtn.style.color = '#fff';
+      } else {
+        paymentBtn.textContent = 'Make Payment';
+        paymentBtn.style.background = '#0f4d2f';
+        paymentBtn.style.color = '#fff';
+      }
+      cacheDOM('displayPaymentMethod').value = payment.method || '';
+      cacheDOM('displayTipAmount').value = payment.tipAmount || '';
+      cacheDOM('displayTipMethod').value = payment.tipMethod || '';
+      const status = cacheDOM('paymentStatus');
+      if (!payment.amountPaid) {
+        status.innerText = '';
+      } else if (balance === 0) {
+        status.innerText = '✅ PAID';
+        status.style.color = '#16a34a';
+      } else {
+        status.innerText = '🟠 PAID with Balance';
+        status.style.color = '#f59e0b';
+      }
+    })
+    .withFailureHandler(err => console.error(err))
+    .getPaymentDetails(visitId);
+}
+
+function loadAllVisitProcedures() {
+  google.script.run
+    .withSuccessHandler(showAllVisitProcedures)
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .getAllVisitProcedures();
+}
+
+function showAllVisitProcedures(data) {
+  const table = cacheDOM('visitProceduresTable');
+  table.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  (data || []).forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td>' + escapeHtml(p.visitId) + '</td><td>' + escapeHtml(p.procedure) + '</td><td>' + escapeHtml(p.staff) + '</td><td>₱' + Number(p.price).toLocaleString('en-PH') + '</td>';
+    frag.appendChild(tr);
+  });
+  table.appendChild(frag);
+}
+
+function filterVisitProceduresTable(query) {
+  const filter = query.toLowerCase().trim();
+  const rows = document.querySelectorAll('#visitProceduresTable tr');
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    if (!row.cells || row.cells.length < 4) return;
+
+    const visitId = row.cells[0].innerText.toLowerCase();
+    const procedure = row.cells[1].innerText.toLowerCase();
+    const staff = row.cells[2].innerText.toLowerCase();
+    const price = row.cells[3].innerText.toLowerCase();
+
+    const matches = !filter ||
+      visitId.includes(filter) ||
+      procedure.includes(filter) ||
+      staff.includes(filter) ||
+      price.includes(filter);
+
+    row.style.display = matches ? '' : 'none';
+    if (matches) visibleCount++;
+  });
+
+  // Update search result count
+  const searchContainer = document.querySelector('#visitProcedures-view .search-container');
+  if (searchContainer && filter) {
+    let countEl = searchContainer.querySelector('.search-count');
+    if (!countEl) {
+      countEl = document.createElement('span');
+      countEl.className = 'search-count';
+      countEl.style.cssText = 'font-size:12px;color:var(--text-muted);margin-left:10px;';
+      searchContainer.appendChild(countEl);
+    }
+    countEl.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
+  } else if (searchContainer) {
+    const countEl = searchContainer.querySelector('.search-count');
+    if (countEl) countEl.remove();
+  }
+}
+
+function loadProcedures() {
+  const table = cacheDOM('proceduresTable');
+  if (table) table.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:20px"><i class="fa-solid fa-spinner fa-spin"></i> Loading procedures...</td></tr>';
+  google.script.run
+    .withSuccessHandler(showProcedures)
+    .withFailureHandler(err => {
+      console.error(err);
+      if (table) table.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#ef4444;padding:20px"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load procedures: ' + err.message + '</td></tr>';
+      alert('Error: ' + err.message);
+    })
+    .getProcedures();
+}
+
+function showProcedures(data) {
+  const table = cacheDOM('proceduresTable');
+  table.innerHTML = '';
+  if (!data || !data.length) {
+    table.innerHTML = '<tr><td colspan="3" style="text-align:center">No procedures found</td></tr>';
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  data.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => openEditProcedureModal(p);
+    const cleanPrice = String(p.price).replace(/[₱,]/g, '');
+    tr.innerHTML = '<td>' + escapeHtml(p.type) + '</td><td>' + escapeHtml(p.name) + '</td><td>₱' + Number(cleanPrice).toLocaleString('en-PH') + '</td>';
+    frag.appendChild(tr);
+  });
+  table.appendChild(frag);
+}
+
+function filterProceduresTable(query) {
+  const filter = query.toLowerCase().trim();
+  const rows = document.querySelectorAll('#proceduresTable tr');
+  let visibleCount = 0;
+
+  rows.forEach(row => {
+    if (!row.cells || row.cells.length < 3) return;
+
+    const type = row.cells[0].innerText.toLowerCase();
+    const name = row.cells[1].innerText.toLowerCase();
+    const price = row.cells[2].innerText.toLowerCase();
+
+    const matches = !filter ||
+      type.includes(filter) ||
+      name.includes(filter) ||
+      price.includes(filter);
+
+    row.style.display = matches ? '' : 'none';
+    if (matches) visibleCount++;
+  });
+
+  // Update search result count
+  const searchContainer = document.querySelector('#procedures-view .search-container');
+  if (searchContainer && filter) {
+    let countEl = searchContainer.querySelector('.search-count');
+    if (!countEl) {
+      countEl = document.createElement('span');
+      countEl.className = 'search-count';
+      countEl.style.cssText = 'font-size:12px;color:var(--text-muted);margin-left:10px;';
+      searchContainer.appendChild(countEl);
+    }
+    countEl.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
+  } else if (searchContainer) {
+    const countEl = searchContainer.querySelector('.search-count');
+    if (countEl) countEl.remove();
+  }
+}
+
+function saveNewProcedure() {
+  const btn = document.querySelector('#procedureMasterModal .save-btn');
+  const row = cacheDOM('editProcedureRow').value;
+  const data = {
+    row: row,
+    type: cacheDOM('newProcedureType').value,
+    name: cacheDOM('newProcedureName').value.trim(),
+    price: cacheDOM('newProcedurePrice').value.replace(/[₱,]/g, '')
+  };
+  btn.disabled = true;
+  btn.textContent = row ? 'Updating Procedure...' : 'Saving Procedure...';
+  const onFail = err => { alert('Error: ' + err.message); btn.disabled = false; btn.textContent = 'Save'; };
+  setTimeout(() => {
+    if (row) {
+      google.script.run
+        .withSuccessHandler(() => { btn.disabled = false; btn.textContent = 'Save'; closeProcedureMasterModal(); loadProcedures(); })
+        .withFailureHandler(onFail)
+        .updateProcedure(data);
+    } else {
+      google.script.run
+        .withSuccessHandler(() => { btn.disabled = false; btn.textContent = 'Save'; closeProcedureMasterModal(); loadProcedures(); })
+        .withFailureHandler(onFail)
+        .addProcedure(data);
+    }
+  }, 100);
+}
+
+function closeProcedureMasterModal() { cacheDOM('procedureMasterModal').style.display = 'none'; }
+
+function loadPaymentsReport() {
+  if (appAccess && appAccess.canViewPaymentsReport === false) {
+    alert('You do not have access to the Payments report.');
+    return;
+  }
+  const start = cacheDOM('paymentsStart').value;
+  const end = cacheDOM('paymentsEnd').value;
+  const branch = cacheDOM('paymentsBranch').value;
+  google.script.run
+    .withSuccessHandler(showPaymentsReport)
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .getPaymentsReport(start, end, branch);
+}
+
+function renderPaymentsBreakdown(byMethod, byTipMethod) {
+  const el = cacheDOM('paymentsBreakdown');
+  const line = function (m) {
+    return Object.keys(m).sort().map(function (k) {
+      return '<span>' + escapeHtml(k) + ': ₱' + Number(m[k]).toLocaleString('en-PH') + '</span>';
+    }).join(' · ');
+  };
+  let blocks = '';
+  if (Object.keys(byMethod).length) {
+    blocks += '<div style="margin-bottom:10px"><strong>By payment method</strong><div style="margin-top:4px;line-height:1.5">' + line(byMethod) + '</div></div>';
+  }
+  if (Object.keys(byTipMethod).length) {
+    blocks += '<div><strong>By tip method</strong><div style="margin-top:4px;line-height:1.5">' + line(byTipMethod) + '</div></div>';
+  }
+  el.innerHTML = blocks || '<span style="color:var(--text-muted)">No rows in this filter.</span>';
+}
+
+function showPaymentsReport(data) {
+  data = data || { rows: [], totalAmount: 0, totalTip: 0, grandTotal: 0, byMethod: {}, byTipMethod: {}, count: 0 };
+  const tbody = cacheDOM('paymentsTableBody');
+  tbody.innerHTML = '';
+  if (!data.rows || !data.rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted)">No payments match this filter.</td></tr>';
+  } else {
+    const frag = document.createDocumentFragment();
+    data.rows.forEach(function (r) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + escapeHtml(r.visitId) + '</td><td>' + escapeHtml(r.patientName) + '</td><td>' + escapeHtml(r.visitDate) + '</td><td>' + escapeHtml(r.branch) + '</td><td>₱' + Number(r.amountPaid).toLocaleString('en-PH') + '</td><td>' + escapeHtml(r.method) + '</td><td>₱' + Number(r.tipAmount).toLocaleString('en-PH') + '</td><td>' + escapeHtml(r.tipMethod) + '</td>';
+      frag.appendChild(tr);
+    });
+    tbody.appendChild(frag);
+  }
+  const n = data.count || 0;
+  cacheDOM('paymentsFootSummaryLabel').textContent = 'Totals (' + n + ' payment' + (n === 1 ? '' : 's') + ')';
+  cacheDOM('paymentsFootAmount').textContent = '₱' + Number(data.totalAmount || 0).toLocaleString('en-PH');
+  cacheDOM('paymentsFootTip').textContent = '₱' + Number(data.totalTip || 0).toLocaleString('en-PH');
+  cacheDOM('paymentsFootGrand').textContent = '₱' + Number(data.grandTotal || 0).toLocaleString('en-PH');
+  renderPaymentsBreakdown(data.byMethod || {}, data.byTipMethod || {});
+}
+
+function loadStaffCommissions() {
+  const start = cacheDOM('commissionStart').value;
+  const end = cacheDOM('commissionEnd').value;
+  const branch = cacheDOM('commissionBranch').value;
+  const staff = cacheDOM('commissionStaff').value;
+  google.script.run
+    .withSuccessHandler(function (data) {
+      const tbody = cacheDOM('commissionTable');
+      tbody.innerHTML = '';
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="6">No commissions found.</td></tr>';
+        cacheDOM('commissionTotalAmount').innerText = '₱0.00';
+        cacheDOM('commissionTotalTip').innerText = '₱0.00';
+        cacheDOM('commissionTotalCombined').innerText = '₱0.00';
+        return;
+      }
+      loadCommissionStaffFilter(data);
+      let totalCommission = 0;
+      let totalTip = 0;
+      let totalCombined = 0;
+      const frag = document.createDocumentFragment();
+      data.forEach(row => {
+        const commission = Number(row.amount) || 0;
+        const tip = Number(row.tip) || 0;
+        const combined = commission + tip;
+        totalCommission += commission;
+        totalTip += tip;
+        totalCombined += combined;
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + escapeHtml(row.staff) + '</td><td>' + escapeHtml(row.date) + '</td><td>' + escapeHtml(row.procedure) + '</td><td>₱' + commission.toLocaleString('en-PH') + '</td><td>₱' + tip.toLocaleString('en-PH') + '</td><td>₱' + combined.toLocaleString('en-PH') + '</td>';
+        frag.appendChild(tr);
+      });
+      tbody.appendChild(frag);
+      cacheDOM('commissionTotalAmount').innerText = '₱' + totalCommission.toLocaleString('en-PH');
+      cacheDOM('commissionTotalTip').innerText = '₱' + totalTip.toLocaleString('en-PH');
+      cacheDOM('commissionTotalCombined').innerText = '₱' + totalCombined.toLocaleString('en-PH');
+    })
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .getStaffCommissions(start, end, branch, staff);
+}
+
+function openEditProcedureModal(p) {
+  cacheDOM('procedureMasterModal').style.display = 'block';
+  document.querySelector('#procedureMasterModal h2').innerText = 'Edit Procedure';
+  cacheDOM('editProcedureRow').value = p.row;
+  cacheDOM('newProcedureType').value = p.type;
+  cacheDOM('newProcedureName').value = p.name;
+  cacheDOM('newProcedurePrice').value = '₱' + Number(String(p.price).replace(/[₱,]/g, '')).toLocaleString('en-PH');
+}
+
+function openProcedureMasterModal() {
+  cacheDOM('procedureMasterModal').style.display = 'block';
+  document.querySelector('#procedureMasterModal h2').innerText = 'Add Procedure';
+  cacheDOM('editProcedureRow').value = '';
+  cacheDOM('newProcedureType').value = 'Doctor';
+  cacheDOM('newProcedureName').value = '';
+  cacheDOM('newProcedurePrice').value = '';
+}
+
+function loadCommissionStaffFilter(data) {
+  const dropdown = cacheDOM('commissionStaff');
+  const current = dropdown.value;
+  const uniqueStaff = [...new Set(data.map(x => x.staff).filter(Boolean))].sort();
+  dropdown.innerHTML = '<option value="">All Staff</option>';
+  uniqueStaff.forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    dropdown.appendChild(opt);
+  });
+  dropdown.value = current;
+}
+
+function loadExistingSessions() {
+  const visitId = cacheDOM('editVisitId').value;
+  const currentVisit = allVisits.find(v => v.visitId == visitId);
+  if (!currentVisit) return;
+  google.script.run
+    .withSuccessHandler(function (bundles) {
+      if (!bundles.length) {
+        alert('No active treatment packages found');
+        return;
+      }
+      const selected = bundles[bundles.length - 1];
+      openProcedureModal();
+      cacheDOM('procedureType').value = selected.type;
+      loadProcedureNames(function () {
+        cacheDOM('procedureName').value = selected.procedure;
+        cacheDOM('procedureVariant').value = selected.variant || '';
+        cacheDOM('procedureSession').value = selected.nextSession;
+        cacheDOM('procedureTotalSessions').value = selected.totalSessions;
+        cacheDOM('procedurePrice').value = '₱0';
+        cacheDOM('procedureBundleId').value = selected.bundleId;
+      });
+    })
+    .withFailureHandler(err => alert('Error: ' + err.message))
+    .getActiveTreatmentBundles(currentVisit.patientId);
+}
+
+// Daily Expenses Functions
+function loadExpenses() {
+  const start = cacheDOM('expensesStart').value;
+  const end = cacheDOM('expensesEnd').value;
+  const branch = cacheDOM('expensesBranch').value;
+  google.script.run
+    .withSuccessHandler(showExpenses)
+    .withFailureHandler(err => alert('Error loading expenses: ' + err.message))
+    .getDailyExpenses(start, end, branch);
+}
+
+function showExpenses(data) {
+  const tbody = cacheDOM('expensesTableBody');
+  tbody.innerHTML = '';
+  if (!data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No expenses match this filter.</td></tr>';
+  } else {
+    const frag = document.createDocumentFragment();
+    data.forEach(function (expense) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + escapeHtml(expense.id) + '</td><td>' + escapeHtml(expense.date) + '</td><td>' + escapeHtml(expense.branch) + '</td><td>' + escapeHtml(expense.description) + '</td><td>₱' + Number(expense.amount).toLocaleString('en-PH') + '</td><td><button class="save-btn btn-secondary" style="padding:4px 8px;font-size:12px" onclick="editExpense(' + expense.row + ')">Edit</button> <button class="save-btn btn-danger" style="padding:4px 8px;font-size:12px" onclick="deleteExpense(' + expense.row + ')">Delete</button></td>';
+      frag.appendChild(tr);
+    });
+    tbody.appendChild(frag);
+  }
+  const total = data ? data.reduce((sum, exp) => sum + exp.amount, 0) : 0;
+  const count = data ? data.length : 0;
+  cacheDOM('expensesFootSummaryLabel').textContent = 'Total (' + count + ' expense' + (count === 1 ? '' : 's') + ')';
+  cacheDOM('expensesFootAmount').textContent = '₱' + Number(total).toLocaleString('en-PH');
+}
+
+function loadCashFlow() {
+  const date = cacheDOM('cashFlowDate').value;
+  if (!date) {
+    alert('Please select a date for cash flow calculation.');
+    return;
+  }
+  const branch = cacheDOM('expensesBranch').value;
+  google.script.run
+    .withSuccessHandler(showCashFlow)
+    .withFailureHandler(err => alert('Error loading cash flow: ' + err.message))
+    .getDailyCashFlow(date, branch);
+}
+
+function showCashFlow(data) {
+  cacheDOM('cashFlowSummary').style.display = 'block';
+  cacheDOM('cashReceived').textContent = '₱' + Number(data.cashReceived || 0).toLocaleString('en-PH');
+  cacheDOM('totalExpenses').textContent = '₱' + Number(data.totalExpenses || 0).toLocaleString('en-PH');
+  cacheDOM('cashOnHand').textContent = '₱' + Number(data.cashOnHand || 0).toLocaleString('en-PH');
+}
+
+function openExpenseModal() {
+  cacheDOM('expenseModalTitle').textContent = 'Add Daily Expense';
+  cacheDOM('expenseRowIndex').value = '';
+  cacheDOM('expenseDate').value = new Date().toISOString().split('T')[0];
+  cacheDOM('expenseBranch').value = appAccess.lockBranch || '';
+  cacheDOM('expenseDescription').value = '';
+  cacheDOM('expenseAmount').value = '';
+  cacheDOM('saveExpenseBtn').textContent = 'Save Expense';
+  cacheDOM('expenseModal').style.display = 'block';
+}
+
+function closeExpenseModal() {
+  cacheDOM('expenseModal').style.display = 'none';
+}
+
+function editExpense(rowIndex) {
+  // Find the expense data from the current table
+  const rows = cacheDOM('expensesTableBody').querySelectorAll('tr');
+  for (let row of rows) {
+    const cells = row.querySelectorAll('td');
+    if (cells.length >= 5) {
+      const editBtn = cells[5].querySelector('button:first-child');
+      if (editBtn && editBtn.onclick.toString().includes(rowIndex)) {
+        // This is the row we want
+        const id = cells[0].textContent;
+        const date = cells[1].textContent;
+        const branch = cells[2].textContent;
+        const description = cells[3].textContent;
+        const amount = cells[4].textContent.replace('₱', '').replace(/,/g, '');
+
+        cacheDOM('expenseModalTitle').textContent = 'Edit Expense';
+        cacheDOM('expenseRowIndex').value = rowIndex;
+        cacheDOM('expenseDate').value = date.split('/').reverse().join('-'); // Convert MM/dd/yyyy to yyyy-MM-dd
+        cacheDOM('expenseBranch').value = branch;
+        cacheDOM('expenseDescription').value = description;
+        cacheDOM('expenseAmount').value = '₱' + amount;
+        cacheDOM('saveExpenseBtn').textContent = 'Update Expense';
+        cacheDOM('expenseModal').style.display = 'block';
+        break;
+      }
+    }
+  }
+}
+
+function saveExpense() {
+  const data = {
+    row: cacheDOM('expenseRowIndex').value ? Number(cacheDOM('expenseRowIndex').value) : null,
+    date: cacheDOM('expenseDate').value,
+    branch: cacheDOM('expenseBranch').value,
+    description: cacheDOM('expenseDescription').value.trim(),
+    amount: Number(cacheDOM('expenseAmount').value.replace(/[₱,]/g, '').trim())
+  };
+
+  if (!data.date || !data.branch || !data.description || !data.amount) {
+    alert('Please fill in all fields.');
+    return;
+  }
+
+  const btn = cacheDOM('saveExpenseBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const callback = data.row ? 'updateDailyExpense' : 'saveDailyExpense';
+
+  google.script.run
+    .withSuccessHandler(() => {
+      btn.disabled = false;
+      btn.textContent = data.row ? 'Update Expense' : 'Save Expense';
+      closeExpenseModal();
+      loadExpenses();
+    })
+    .withFailureHandler(err => {
+      alert('Error: ' + err.message);
+      btn.disabled = false;
+      btn.textContent = data.row ? 'Update Expense' : 'Save Expense';
+    })
+    [callback](data);
+}
+
+function deleteExpense(rowIndex) {
+  if (!confirm('Are you sure you want to delete this expense?')) {
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(() => {
+      loadExpenses();
+    })
+    .withFailureHandler(err => alert('Error deleting expense: ' + err.message))
+    .deleteDailyExpense(rowIndex);
+}
+  </script>
+</body>
+
+</html>  <button type="button" class="nav-item" data-section="commissions"><i class="fa-solid fa-file-invoice-dollar"></i> Staff Commissions</button>
   <button type="button" class="nav-item" data-section="payments"><i class="fa-solid fa-money-bill-wave"></i> Payments</button>
   <button type="button" class="nav-item" data-section="expenses"><i class="fa-solid fa-receipt"></i> Daily Expenses</button>
   <button type="button" class="nav-item" data-section="inventory"><i class="fa-solid fa-box-archive"></i> Inventory</button>

@@ -1,0 +1,5 @@
+old_downloaded_assets/**
+.git/**
+.gitignore
+.DS_Store
+node_modules/**
